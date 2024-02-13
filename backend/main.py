@@ -16,34 +16,39 @@ logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("main_py")
 log.setLevel(logging.INFO)
 
-@asynccontextmanager
-async def lifespan(_: FastAPI):
-    """Startup event"""
-    log.debug("Startup event")
-    def run():
-        proxy_http.run(target_url=config['target_url'], port=int(config['port']))
-    threading.Thread(target=run, daemon=True).start()
-    log.debug("Startup event end")
-    yield
-    
+log.info("Starting proxy server ...")
+server_manager = proxy_http.ServerManager()
+server_manager.run()
+log.info("Proxy server started.")
 openapi_tags = [
     {
         "name": "config",
         "description": "Config from yaml file",
     },
+    {
+        "name": "start",
+        "description": "Starts the proxy server",
+    }
 ]
 
-app = FastAPI(lifespan=lifespan, openapi_tags=openapi_tags)
+app = FastAPI(openapi_tags=openapi_tags)
 
 @app.get("/api/config", tags=["config"])
 async def read_config():
     """Return config from yaml file"""
     return config
 
-@app.get("/api")
-async def read_root():
-    """Return Hello World"""
-    return {"Hello": "World"}
+@app.get("/api/start")
+async def start():
+    """Starts the proxy server"""
+    global httpd
+    target_url = "http://example.com"
+    port = int(config['port'])
+    log.info(f"Starting server for {target_url} on port {port}")
+    server_manager.stop()
+    server_manager._target_url = target_url
+    server_manager.run()
+    return {"status": "Server started"}
 
 @app.get("/api/items/{item_id}")
 async def read_item(item_id: int, q: Union[str, None] = None):

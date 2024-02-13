@@ -9,7 +9,7 @@ def static_file_response(base_dir: str, uri_path: str) -> HTMLResponse:
     """Return a static files (if exists) or index.html (if exists) from the base_dir"""
     file_path = Path(base_dir) / uri_path
     if file_path.exists() and file_path.is_file():
-        return HTMLResponse(content=file_path.read_text(), status_code=200, headers=get_file_headers(file_path))
+        return HTMLResponse(content=file_path.read_bytes(), status_code=200, headers=get_file_headers(file_path))
     index_path = Path(base_dir) / 'index.html'
     if not index_path.exists():
         raise HTTPException(status_code=404, detail="Page not found")

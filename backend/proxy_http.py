@@ -1,10 +1,10 @@
-from http.server import HTTPServer, SimpleHTTPRequestHandler
+from http.server import HTTPServer, SimpleHTTPRequestHandler, ThreadingHTTPServer
 import json
 from socketserver import ThreadingMixIn
 import threading
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import urlparse
 import requests
-import brotli
+
 from storage import Storage
 import model
 from datetime import datetime
@@ -14,6 +14,7 @@ class ProxyHTTP(ThreadingMixIn, SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         self.target_url = kwargs.pop('target_url', 'https://example.com')
         self._storage = Storage()
+        print(f"Proxy for {self.target_url}")
         super().__init__(*args, **kwargs)
 
     def do_GET(self):
@@ -87,17 +88,36 @@ class ProxyHTTP(ThreadingMixIn, SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(content)
 
-def make_server_handler(target_url):
-    def handler(*args, **kwargs):
-        return ProxyHTTP(*args, target_url=target_url, **kwargs)
-    return handler
+class ServerManager:
+    def __init__(self) -> None:
+        self._server_class=ThreadingHTTPServer
+        self._port=8999
+        self._target_url='https://www.parkiet.com'
+        self._httpd=None
+        self._proxy=None
+        self._thread=None
 
-def run(server_class=HTTPServer, port=8999, target_url='https://example.com'):
-    server_address = ('', port)
-    handler = make_server_handler(target_url)
-    httpd = server_class(server_address, handler)
-    print(f'Starting httpd on port {port}...')
-    httpd.serve_forever()
+    def run(self) -> ThreadingHTTPServer:
+        server_address = ('', self._port)
+        def handler(*args, **kwargs):
+            print(f"Proxy creating {self._target_url} ...")
+            self._proxy = ProxyHTTP(*args, target_url=self._target_url, **kwargs)
+            print("Proxy created")
+            return self._proxy
+        self._httpd = self._server_class(server_address, handler)
+        print("Server created")
+        self._thread = threading.Thread(target=self._httpd.serve_forever, daemon=True)
+        self._thread.start()
+        print(f'Starting http proxy on port {self._port}...')
+        return self._httpd
+
+    def stop(self):
+        if self._httpd:
+            print("Stopping server ...")
+            self._httpd.shutdown()
+            print("Server stopped 1")
+            self._thread.join()
+            print("Server stopped 2")
 
 if __name__ == '__main__':
     run()

@@ -1,0 +1,5 @@
+title: !ENV ${TITLE:Marcin}
+version: 1.0.0
+organization:
+  name: "My Organization"
+  address: "123 Main St"

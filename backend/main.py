@@ -14,20 +14,22 @@ config = parse_config('./config.yaml')
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("main_py")
-log.setLevel(logging.INFO)
 
-log.info("Starting proxy server ...")
 server_manager = proxy_http.ServerManager()
 server_manager.run()
-log.info("Proxy server started.")
+
 openapi_tags = [
     {
         "name": "config",
         "description": "Config from yaml file",
     },
     {
-        "name": "start",
-        "description": "Starts the proxy server",
+        "name": "proxy",
+        "description": "Proxy server",
+    },
+    {
+        "name": "angular_files",
+        "description": "Serves static Angular files",
     }
 ]
 
@@ -38,25 +40,20 @@ async def read_config():
     """Return config from yaml file"""
     return config
 
-@app.get("/api/start")
-async def start():
+@app.get("/api/start", tags=["proxy"])
+async def proxy_start():
     """Starts the proxy server"""
-    global httpd
-    target_url = "http://example.com"
-    port = int(config['port'])
-    log.info(f"Starting server for {target_url} on port {port}")
     server_manager.stop()
-    server_manager._target_url = target_url
     server_manager.run()
     return {"status": "Server started"}
 
-@app.get("/api/items/{item_id}")
-async def read_item(item_id: int, q: Union[str, None] = None):
-    """Return item_id and q"""
-    return {"item_id": item_id, "q": q}
+@app.get("/api/status", tags=["proxy"])
+async def proxy_status() -> proxy_http.Status:
+    """Return porxy server status"""
+    return server_manager.get_status()
 
 # Angular static files - it have to be at the end of file
-@app.get("/{full_path:path}", response_class=HTMLResponse)
+@app.get("/{full_path:path}", response_class=HTMLResponse, tags=["angular_files"])
 async def catch_all(_: Request, full_path: str):
     """Catch all for Angular routing"""
     return static_file_response("static/browser", full_path)

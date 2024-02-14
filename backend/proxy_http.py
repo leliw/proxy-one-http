@@ -15,7 +15,7 @@ class ProxyHTTP(ThreadingMixIn, SimpleHTTPRequestHandler):
     """Serwer proxy"""
     def __init__(self, *args, **kwargs):
         self.target_url = kwargs.pop('target_url', 'https://example.com')
-        self._storage = Storage()
+        self._storage =  kwargs.pop('storage', Storage())
         print(f"Proxy for {self.target_url}")
         super().__init__(*args, **kwargs)
 
@@ -121,9 +121,10 @@ class Status(Settings):
 
 class ServerManager:
     """Startuje i zatrzymuje serwer http"""
-    def __init__(self, port: int = 8999, target_url: str = 'https://example.com') -> None:
+    def __init__(self, port: int = 8999, target_url: str = 'https://example.com', storage: Storage = Storage()) -> None:
         self._port = port
         self._target_url = target_url
+        self._storage = storage
         self._httpd = None
         self._thread = None
         self._log = logging.getLogger(__name__)
@@ -137,7 +138,7 @@ class ServerManager:
         server_address = ('', self._port)
 
         def handler(*args, **kwargs):
-            return ProxyHTTP(*args, target_url=self._target_url, **kwargs)
+            return ProxyHTTP(*args, target_url=self._target_url, storage=self._storage, **kwargs)
 
         self._httpd = StoppableHttpServer(server_address, handler)
         self._thread = threading.Thread(target=self._httpd.serve_forever, name="HttpServer", daemon=True)

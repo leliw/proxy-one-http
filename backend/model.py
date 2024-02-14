@@ -8,7 +8,7 @@ from datetime import datetime
 
 class Request(BaseModel):
     """Model for request sotored in JSON format"""
-    start: datetime = Field(default_factory=lambda: datetime.now())
+    start: datetime = Field(default_factory=datetime.now)
     end: Optional[datetime] = None
     url: str
     method: str
@@ -23,14 +23,15 @@ class Request(BaseModel):
     response_body_bytes: Optional[bytes] = None
 
     def set_reqest_body(self, content_type: str, body: bytes | None):
+        """Formats and sets request_body"""
         content_type = content_type.lower() if body else None
         if body and "charset=utf-8" in content_type:
             body_str = body.decode('utf-8')
             if "application/x-www-form-urlencoded" in content_type:
                 body_dict = parse_qs(body_str)
-                for key in body_dict.keys():
-                    if isinstance(body_dict[key], list) and len(body_dict[key]) == 1:
-                        body_dict[key] = body_dict[key][0]
+                for el in body_dict.items():
+                    if isinstance(el, list) and len(el) == 1:
+                        el = el[0]
                 self.request_body_form = {k: body_dict[k] for k in sorted(body_dict)}
             else:
                 self.request_body_str = body_str
@@ -38,6 +39,7 @@ class Request(BaseModel):
             self.request_body_bytes = body
 
     def set_response_body(self, content_type: str, body: bytes | None):
+        """Formats and sets response body"""
         content_type = content_type.lower() if body else None
         if body and "charset=utf-8" in content_type:
             body_str = body.decode('utf-8')

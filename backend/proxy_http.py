@@ -117,7 +117,7 @@ class ServerManager:
         self._thread = None
         self._log = logging.getLogger(__name__)
 
-    def run(self, port: int = None, target_url: str = None) -> StoppableHttpServer:
+    def start(self, port: int = None, target_url: str = None) -> StoppableHttpServer:
         if port:
             self._port = port
         if target_url:
@@ -144,7 +144,7 @@ class ServerManager:
 
     def get_status(self):
         return Status(**{
-            "status" : "working" if self._httpd else "sopped",
+            "status" : "working" if self._httpd else "stopped",
             "port" : self._port,
             "target_url" : self._target_url
         })

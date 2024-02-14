@@ -1,9 +1,6 @@
 """Main file for FastAPI server"""
 import logging
-import threading
-from typing import Union
 from fastapi import FastAPI, Request
-from fastapi.concurrency import asynccontextmanager
 from fastapi.responses import HTMLResponse
 from pyaml_env import parse_config
 import proxy_http
@@ -16,7 +13,7 @@ logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("main_py")
 
 server_manager = proxy_http.ServerManager()
-server_manager.run()
+server_manager.start()
 
 openapi_tags = [
     {
@@ -36,12 +33,17 @@ async def read_config():
     """Return config from yaml file"""
     return config
 
-@app.get("/api/proxy/start", tags=["Proxy"])
+@app.post("/api/proxy/start", tags=["Proxy"])
 async def proxy_start():
     """Starts the proxy server"""
-    server_manager.stop()
-    server_manager.run()
+    server_manager.start()
     return {"status": "Server started"}
+
+@app.post("/api/proxy/stop", tags=["Proxy"])
+async def proxy_stop():
+    """Stopss the proxy server"""
+    server_manager.stop()
+    return {"status": "Server stopped"}
 
 @app.get("/api/proxy/status", tags=["Proxy"])
 async def proxy_status() -> proxy_http.Status:

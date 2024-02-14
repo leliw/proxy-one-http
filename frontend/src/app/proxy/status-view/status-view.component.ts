@@ -19,4 +19,14 @@ export class StatusViewComponent implements OnInit {
         this.proxyService.getStatus().subscribe(status => this.status = status);
     }
 
+    start(): void {
+        this.status.status = "starting"
+        this.proxyService.start().subscribe(() => this.status.status = "working");
+    }
+
+    stop(): void {
+        this.status.status = "stopping"
+        this.proxyService.stop().subscribe(() => this.status.status = "stopped");
+    }
+
 }

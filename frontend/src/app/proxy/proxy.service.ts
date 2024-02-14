@@ -9,7 +9,7 @@ export interface Status {
 }
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class ProxyService {
 
@@ -19,6 +19,14 @@ export class ProxyService {
 
     getStatus(): Observable<Status> {
         return this.http.get<Status>(this.apiUrl + '/status');
-      }
+    }
+
+    start(): Observable<void> {
+        return this.http.post<void>(this.apiUrl + '/start', '');
+    }
     
+    stop(): Observable<void> {
+        return this.http.post<void>(this.apiUrl + '/stop', '');
+    }
+
 }

@@ -1,0 +1,5 @@
+<div *ngIf="status">
+    <div>Status: {{status.status}}</div>
+    <div *ngIf="status.port"><a href="http://localhost:{{status.port}}/" target="proxy">http://localhost:{{status.port}}</a></div>
+    <div *ngIf="status.target_url"><a href="{{status.target_url}}" target="proxy_target">{{status.target_url}}</a></div>
+</div>

@@ -20,40 +20,36 @@ server_manager.run()
 
 openapi_tags = [
     {
-        "name": "config",
-        "description": "Config from yaml file",
-    },
-    {
-        "name": "proxy",
+        "name": "Proxy",
         "description": "Proxy server",
     },
     {
-        "name": "angular_files",
-        "description": "Serves static Angular files",
+        "name": "Angular files",
+        "description": "Static Angular files",
     }
 ]
 
 app = FastAPI(openapi_tags=openapi_tags)
 
-@app.get("/api/config", tags=["config"])
+@app.get("/api/config")
 async def read_config():
     """Return config from yaml file"""
     return config
 
-@app.get("/api/start", tags=["proxy"])
+@app.get("/api/proxy/start", tags=["Proxy"])
 async def proxy_start():
     """Starts the proxy server"""
     server_manager.stop()
     server_manager.run()
     return {"status": "Server started"}
 
-@app.get("/api/status", tags=["proxy"])
+@app.get("/api/proxy/status", tags=["Proxy"])
 async def proxy_status() -> proxy_http.Status:
     """Return porxy server status"""
     return server_manager.get_status()
 
 # Angular static files - it have to be at the end of file
-@app.get("/{full_path:path}", response_class=HTMLResponse, tags=["angular_files"])
+@app.get("/{full_path:path}", response_class=HTMLResponse, tags=["Angular files"])
 async def catch_all(_: Request, full_path: str):
     """Catch all for Angular routing"""
     return static_file_response("static/browser", full_path)

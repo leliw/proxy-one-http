@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { ConfigService } from './config/config.service';
+import { StatusViewComponent } from './proxy/status-view/status-view.component';
 
 export interface Hello {
     Hello: string;
@@ -10,7 +11,7 @@ export interface Hello {
 @Component({
     selector: 'app-root',
     standalone: true,
-    imports: [CommonModule, RouterOutlet, HttpClientModule],
+    imports: [CommonModule, RouterOutlet, HttpClientModule, StatusViewComponent],
     templateUrl: './app.component.html',
     styleUrl: './app.component.css'
 })

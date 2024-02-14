@@ -1,15 +1,16 @@
+"""Proxy Server"""
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 import logging
 from socketserver import ThreadingMixIn
 import threading
 from typing import Optional
 from urllib.parse import urlparse
-from pydantic import BaseModel
+from datetime import datetime
 import requests
+from pydantic import BaseModel
 
 from storage import Storage
 import model
-from datetime import datetime
 
 class ProxyHTTP(ThreadingMixIn, SimpleHTTPRequestHandler):
     """Serwer proxy"""
@@ -100,13 +101,21 @@ class ProxyHTTP(ThreadingMixIn, SimpleHTTPRequestHandler):
 class StoppableHttpServer (ThreadingHTTPServer):
     """http server that reacts to self.stop flag"""
 
-    def serve_forever (self):
-        """Handle one request at a time until stopped."""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.stop = False
-        self.timeout = 1
+
+    def serve_forever (self, poll_interval=0.5):
+        """Handle one request at a time until stopped."""
+        self.timeout = poll_interval
         while not self.stop:
             self.handle_request()
-            
+
+class Status(BaseModel):
+    """Proxy server status"""
+    status: str
+    port: Optional[int]
+    target_url: Optional[str]
 
 class ServerManager:
     """Startuje i zatrzymuje serwer http"""
@@ -117,7 +126,8 @@ class ServerManager:
         self._thread = None
         self._log = logging.getLogger(__name__)
 
-    def start(self, port: int = None, target_url: str = None) -> StoppableHttpServer:
+    def start(self, port: int = None, target_url: str = None) -> Status:
+        """Starts proxy server"""
         if port:
             self._port = port
         if target_url:
@@ -126,14 +136,15 @@ class ServerManager:
 
         def handler(*args, **kwargs):
             return ProxyHTTP(*args, target_url=self._target_url, **kwargs)
-        
+
         self._httpd = StoppableHttpServer(server_address, handler)
         self._thread = threading.Thread(target=self._httpd.serve_forever, name="HttpServer", daemon=True)
         self._thread.start()
-        self._log.info(f'Started http proxy on port {self._port} => {self._target_url}')
-        return self._httpd
+        self._log.info('Started http proxy on port %d => %s', self._port, self._target_url)
+        return self.get_status()
 
-    def stop(self):
+    def stop(self) -> Status:
+        """Stops proxy server"""
         if self._httpd:
             self._log.debug("Stopping server ...")
             self._httpd.stop = True
@@ -141,15 +152,12 @@ class ServerManager:
             self._thread.join()
             self._httpd = None
             self._log.info("Server stopped.")
+        return self.get_status()
 
-    def get_status(self):
+    def get_status(self) -> Status:
+        """Returns proxy server status"""
         return Status(**{
             "status" : "working" if self._httpd else "stopped",
             "port" : self._port,
             "target_url" : self._target_url
         })
-    
-class Status(BaseModel):
-    status: str
-    port: Optional[int]
-    target_url: Optional[str]

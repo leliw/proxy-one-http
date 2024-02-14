@@ -36,14 +36,12 @@ async def read_config():
 @app.post("/api/proxy/start", tags=["Proxy"])
 async def proxy_start():
     """Starts the proxy server"""
-    server_manager.start()
-    return {"status": "Server started"}
+    return server_manager.start()
 
 @app.post("/api/proxy/stop", tags=["Proxy"])
 async def proxy_stop():
     """Stopss the proxy server"""
-    server_manager.stop()
-    return {"status": "Server stopped"}
+    return server_manager.stop()
 
 @app.get("/api/proxy/status", tags=["Proxy"])
 async def proxy_status() -> proxy_http.Status:

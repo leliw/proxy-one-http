@@ -21,12 +21,12 @@ export class ProxyService {
         return this.http.get<Status>(this.apiUrl + '/status');
     }
 
-    start(): Observable<void> {
-        return this.http.post<void>(this.apiUrl + '/start', '');
+    start(): Observable<Status> {
+        return this.http.post<Status>(this.apiUrl + '/start', '');
     }
-    
-    stop(): Observable<void> {
-        return this.http.post<void>(this.apiUrl + '/stop', '');
+
+    stop(): Observable<Status> {
+        return this.http.post<Status>(this.apiUrl + '/stop', '');
     }
 
 }

@@ -34,9 +34,9 @@ async def read_config():
     return config
 
 @app.post("/api/proxy/start", tags=["Proxy"])
-async def proxy_start():
+async def proxy_start(settings: proxy_http.Settings):
     """Starts the proxy server"""
-    return server_manager.start()
+    return server_manager.start(port=settings.port, target_url=settings.target_url)
 
 @app.post("/api/proxy/stop", tags=["Proxy"])
 async def proxy_stop():

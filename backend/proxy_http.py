@@ -3,7 +3,6 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 import logging
 from socketserver import ThreadingMixIn
 import threading
-from typing import Optional
 from urllib.parse import urlparse
 from datetime import datetime
 import requests
@@ -111,11 +110,14 @@ class StoppableHttpServer (ThreadingHTTPServer):
         while not self.stop:
             self.handle_request()
 
-class Status(BaseModel):
+class Settings(BaseModel):
+    """Proxy server setting"""
+    port: int = 8999
+    target_url: str = 'https://example.com'
+
+class Status(Settings):
     """Proxy server status"""
     status: str
-    port: Optional[int]
-    target_url: Optional[str]
 
 class ServerManager:
     """Startuje i zatrzymuje serwer http"""

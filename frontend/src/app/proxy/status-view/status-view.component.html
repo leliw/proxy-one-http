@@ -4,6 +4,12 @@
         <a *ngIf="status.status=='stopped'" href="javascript:void()" (click)="start()">start</a>
         <a *ngIf="status.status=='working'" href="javascript:void()" (click)="stop()">stop</a>
     </div>
-    <div *ngIf="status.port"><a href="http://localhost:{{status.port}}/" target="proxy">http://localhost:{{status.port}}</a></div>
-    <div *ngIf="status.target_url"><a href="{{status.target_url}}" target="proxy_target">{{status.target_url}}</a></div>
+    <div>
+        <a *ngIf="status.status!='stopped'" href="http://localhost:{{status.port}}/" target="proxy">http://localhost:{{status.port}}</a>
+        <span *ngIf="status.status=='stopped'" >http://localhost:<input type="text" [(ngModel)]="settings.port" style="width: 2.5em;"/></span>
+    </div>
+    <div>
+        <a *ngIf="status.status!='stopped'" href="{{status.target_url}}" target="proxy_target">{{status.target_url}}</a>
+        <input *ngIf="status.status=='stopped'" type="text" [(ngModel)]="settings.target_url" />
+    </div>
 </div>

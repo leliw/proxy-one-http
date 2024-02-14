@@ -4,8 +4,13 @@ import { Observable } from 'rxjs';
 
 export interface Status {
     status: string;
-    port: number | undefined;
-    target_url: string | undefined
+    port: number;
+    target_url: string
+}
+
+export interface Settings {
+    port: number;
+    target_url: string
 }
 
 @Injectable({
@@ -21,8 +26,8 @@ export class ProxyService {
         return this.http.get<Status>(this.apiUrl + '/status');
     }
 
-    start(): Observable<Status> {
-        return this.http.post<Status>(this.apiUrl + '/start', '');
+    start(settings: Settings): Observable<Status> {
+        return this.http.post<Status>(this.apiUrl + '/start', settings);
     }
 
     stop(): Observable<Status> {

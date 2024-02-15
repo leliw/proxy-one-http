@@ -11,17 +11,21 @@ from pydantic import BaseModel
 from storage import Storage
 import model
 
+DEFAULT_TARGET_URL = 'https://example.com'
+
 class ProxyHTTP(ThreadingMixIn, SimpleHTTPRequestHandler):
     """Serwer proxy"""
+
     def __init__(self, *args, **kwargs):
-        self.target_url = kwargs.pop('target_url', 'https://example.com')
-        self._storage =  kwargs.pop('storage', Storage())
-        print(f"Proxy for {self.target_url}")
         super().__init__(*args, **kwargs)
+        self.target_url = kwargs.pop('target_url', DEFAULT_TARGET_URL)  
+        self._storage =  kwargs.pop('storage', Storage())
+        self._log = logging.getLogger(__name__)
+        self._log.debug("Proxy for %s", self.target_url)
 
     def do_GET(self):
         """Wykonanie zapytania GET do serwera docelowego"""
-        print(f"GET {self.target_url}{self.path}") 
+        self._log.debug("GET %s%s", self.target_url, self.path) 
         req = model.Request(url=self.path, method="GET")
         response = requests.get(self.target_url + self.path, headers=self._create_headers(), allow_redirects=False)
         self._process_response(response)
@@ -29,7 +33,7 @@ class ProxyHTTP(ThreadingMixIn, SimpleHTTPRequestHandler):
 
     def do_POST(self):
         """Wykonanie zapytania POST do serwera docelowego"""
-        print(f"POST {self.target_url}{self.path}")
+        self._log.debug("POST %s%s", self.target_url, self.path) 
         req = model.Request(url=self.path, method="POST")
         response = requests.post(self.target_url + self.path, data=self._create_data(), headers=self._create_headers(), allow_redirects=False)
         self._process_response(response)
@@ -37,7 +41,7 @@ class ProxyHTTP(ThreadingMixIn, SimpleHTTPRequestHandler):
 
     def do_PUT(self):
         """Wykonanie zapytania PUT do serwera docelowego"""
-        print(f"PUT {self.target_url}{self.path}")
+        self._log.debug("PUT %s%s", self.target_url, self.path) 
         req = model.Request(url=self.path, method="PUT")
         response = requests.put(self.target_url + self.path, data=self._create_data(), headers=self._create_headers(), allow_redirects=False)
         self._process_response(response)
@@ -113,7 +117,7 @@ class StoppableHttpServer (ThreadingHTTPServer):
 class Settings(BaseModel):
     """Proxy server setting"""
     port: int = 8999
-    target_url: str = 'https://example.com'
+    target_url: str = DEFAULT_TARGET_URL
 
 class Status(Settings):
     """Proxy server status"""
@@ -121,7 +125,7 @@ class Status(Settings):
 
 class ServerManager:
     """Startuje i zatrzymuje serwer http"""
-    def __init__(self, port: int = 8999, target_url: str = 'https://example.com', storage: Storage = Storage()) -> None:
+    def __init__(self, port: int = 8999, target_url: str = DEFAULT_TARGET_URL, storage: Storage = Storage()) -> None:
         self._port = port
         self._target_url = target_url
         self._storage = storage

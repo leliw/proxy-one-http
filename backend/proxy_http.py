@@ -8,7 +8,7 @@ from datetime import datetime
 import requests
 from pydantic import BaseModel
 
-from storage import Storage
+from storage import DirectoryStorage
 import model
 
 DEFAULT_TARGET_URL = 'https://example.com'
@@ -18,7 +18,7 @@ class ProxyHTTP(ThreadingMixIn, SimpleHTTPRequestHandler):
 
     def __init__(self, *args, **kwargs):
         self.target_url = kwargs.pop('target_url', DEFAULT_TARGET_URL)  
-        self._storage =  kwargs.pop('storage', Storage())
+        self._storage =  kwargs.pop('storage', DirectoryStorage())
         self._log = logging.getLogger(__name__)
         self._log.debug("Proxy for %s", self.target_url)
         super().__init__(*args, **kwargs)
@@ -73,12 +73,12 @@ class ProxyHTTP(ThreadingMixIn, SimpleHTTPRequestHandler):
         req.set_response_body(req.response_headers.get("Content-Type"), response.content)
 
         file_name = "_".join([
-            str(req.start),
+            str(req.start).replace(" ", "/"),
             req.method,
-            req.url,
+            req.url.replace("/", "_"),
             str(req.status_code)
             ])
-        self._storage.put(key=file_name, value=req.model_dump_json(indent=4, exclude_none=True))
+        self._storage.put(key=file_name, value=req.model_dump(exclude_none=True))
     
     def _process_response(self, response: requests.Response):
         # Jeśli odpowiedź jest skompresowana, to usuwamy nagłówek Content-Encoding
@@ -125,10 +125,12 @@ class Status(Settings):
 
 class ServerManager:
     """Startuje i zatrzymuje serwer http"""
-    def __init__(self, port: int = 8999, target_url: str = DEFAULT_TARGET_URL, storage: Storage = Storage()) -> None:
+    def __init__(self, storage_base_path: str, port: int = 8999, target_url: str = DEFAULT_TARGET_URL) -> None:
         self._port = port
         self._target_url = target_url
-        self._storage = storage
+        self._storage_base_path = storage_base_path
+        sub_path = self._target_url.split("//")[-1].replace("/", "_")
+        self._storage  = DirectoryStorage(base_path=f"{self._storage_base_path}/{sub_path}")
         self._httpd = None
         self._thread = None
         self._log = logging.getLogger(__name__)
@@ -139,6 +141,8 @@ class ServerManager:
             self._port = port
         if target_url:
             self._target_url = target_url
+            sub_path = self._target_url.split("//")[-1].replace("/", "_")
+            self._storage  = DirectoryStorage(base_path=f"{self._storage_base_path}/{sub_path}")
         server_address = ('', self._port)
 
         def handler(*args, **kwargs):

@@ -6,7 +6,7 @@ from pyaml_env import parse_config
 import proxy_http
 
 from static_files import static_file_response
-from storage import Storage
+from storage.directory_storage import DirectoryStorage
 import model
 
 config = parse_config('./config.yaml')
@@ -14,8 +14,8 @@ config = parse_config('./config.yaml')
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("main_py")
 
-storage = Storage(base_path="data/proxy")
-server_manager = proxy_http.ServerManager(storage=storage)
+storage = DirectoryStorage(base_path="data/proxy")
+server_manager = proxy_http.ServerManager("data/proxy")
 server_manager.start()
 
 openapi_tags = [

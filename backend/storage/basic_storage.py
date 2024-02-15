@@ -1,4 +1,7 @@
-"""Siple file based storage"""
+"""
+Simple file based storage (key: value)
+where key is a file name and value is a file content
+"""
 import glob
 import logging
 import os
@@ -32,7 +35,7 @@ class BasicStorage:
         else:
             file_ext = file_ext if file_ext else "json"
             with open(self._create_file_path(sub_path, key, file_ext), 'w', encoding="utf-8") as file:
-                json.dump(value, file, indent=4)
+                json.dump(value, file, indent=4, default=str)
     
     def get(self, key: str, sub_path: str = None, file_ext: str = None) -> any:
         """Reads value from disk"""
@@ -77,10 +80,8 @@ class BasicStorage:
             return os.path.join(full_path, file_name)
 
     def _evaluate_sub_path_and_file_name(self, key: str) -> tuple[str, str]:
-        sub_paths = key.split(" ", maxsplit=2)
-        file_name = self._evaluate_file_name(sub_paths.pop())
-        sub_path = os.path.join(*sub_paths) if sub_paths else None
-        return (sub_path, file_name)
+        file_name = self._evaluate_file_name(key)
+        return (None, file_name)
     
     def _evaluate_file_name(self, key: str) -> str:
         """Evaluate file name for key"""

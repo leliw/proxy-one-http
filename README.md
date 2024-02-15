@@ -6,7 +6,7 @@ It's tool to capture http(s) requests and save it in local folder.
 
 ```bash
 docker pull ghcr.io/leliw/proxy-one-http:latest
-docker run -p 8000:8000 ghcr.io/leliw/proxy-one-http:latest
+docker run -p 8000:8000 -p 8999:8999 -v c:/temp:/app/data ghcr.io/leliw/proxy-one-http:latest
 ```
 
 ## Run in development environment

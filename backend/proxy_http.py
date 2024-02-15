@@ -17,11 +17,11 @@ class ProxyHTTP(ThreadingMixIn, SimpleHTTPRequestHandler):
     """Serwer proxy"""
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
         self.target_url = kwargs.pop('target_url', DEFAULT_TARGET_URL)  
         self._storage =  kwargs.pop('storage', Storage())
         self._log = logging.getLogger(__name__)
         self._log.debug("Proxy for %s", self.target_url)
+        super().__init__(*args, **kwargs)
 
     def do_GET(self):
         """Wykonanie zapytania GET do serwera docelowego"""

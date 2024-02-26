@@ -88,9 +88,9 @@ class ProxyHTTP(ThreadingMixIn, SimpleHTTPRequestHandler):
         content = response.content                
         if content_encoding and content_encoding in ["gzip", "br"]:
             del response.headers['Content-Encoding']
-            response.headers['Content-Length'] = str(len(content))
-            if response.headers.get('Transfer-Encoding'):
-                del response.headers['Transfer-Encoding']
+        response.headers['Content-Length'] = str(len(content))
+        if response.headers.get('Transfer-Encoding'):
+            del response.headers['Transfer-Encoding']
         # Ustawienie kodu odpowiedzi
         self.send_response(response.status_code)
         # Przekazanie nagłówków odpowiedzi

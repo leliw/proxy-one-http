@@ -56,7 +56,13 @@ class ProxyHTTP(ThreadingMixIn, SimpleHTTPRequestHandler):
     def _create_headers(self) -> dict:
         """Pobranie nagłówków aktualnego żądania i zwrócenie ich jako dict"""
         headers = {key: val for key, val in self.headers.items()}
-        headers['Host'] = urlparse(self.target_url).netloc
+        if 'Host' in headers.keys():
+            headers['Host'] = urlparse(self.target_url).netloc
+        if 'Referer' in headers.keys():
+            scheme = urlparse(self.target_url).scheme
+            netloc = urlparse(self.target_url).netloc
+            path = urlparse(headers['Referer']).path
+            headers['Referer'] = f"{scheme}//{netloc}{path}"
         return headers
 
     def _create_data(self) -> bytes:

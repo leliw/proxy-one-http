@@ -3,11 +3,11 @@ import logging
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from pyaml_env import parse_config
-import proxy_http
+import  app.proxy_http as proxy_http
 
-from static_files import static_file_response
+from app.static_files import static_file_response
 from storage.directory_storage import DirectoryStorage
-import model
+import app.model as model
 
 config = parse_config('./config.yaml')
 

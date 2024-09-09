@@ -9,7 +9,7 @@ import requests
 from pydantic import BaseModel
 
 from storage import DirectoryStorage
-import model
+import app.model as model
 
 DEFAULT_TARGET_URL = 'https://example.com'
 

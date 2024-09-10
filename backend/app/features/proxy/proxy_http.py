@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 from datetime import datetime
 import requests
 
-from storage import DirectoryStorage
+from ampf.base.base_storage import BaseStorage
 import app.model as model
 
 
@@ -14,9 +14,9 @@ import app.model as model
 class ProxyHTTP(ThreadingMixIn, SimpleHTTPRequestHandler):
     """Serwer proxy"""
 
-    def __init__(self, *args, target_url: str, **kwargs):
+    def __init__(self, *args, storage: BaseStorage[model.Request], target_url: str, **kwargs):
         self.target_url = target_url
-        self._storage =  kwargs.pop('storage', DirectoryStorage())
+        self._storage =  storage
         self._log = logging.getLogger(__name__)
         self._log.debug("Proxy for %s", self.target_url)
         super().__init__(*args, **kwargs)
@@ -82,7 +82,7 @@ class ProxyHTTP(ThreadingMixIn, SimpleHTTPRequestHandler):
             req.url.replace("/", "_"),
             str(req.status_code)
             ])
-        self._storage.put(key=file_name, value=req.model_dump(exclude_none=True))
+        self._storage.put(key=file_name, value=req)
     
     def _process_response(self, response: requests.Response):
         # Jeśli odpowiedź jest skompresowana, to usuwamy nagłówek Content-Encoding

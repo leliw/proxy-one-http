@@ -5,21 +5,21 @@ from app.features.proxy.proxy_server_manager import ProxyServerManager
 
 
 @pytest.fixture
-def server_manager(tmp_path):
-    sm = ProxyServerManager(str(tmp_path.joinpath("data/proxy")))
+def server_manager(factory):
+    sm = ProxyServerManager(factory)
     sm.start(UserConfig(target_url="http://example.com", port=8999))
     yield sm
     sm.stop()
 
 
-def test_init(tmp_path):
-    t = ProxyServerManager(str(tmp_path.joinpath("data/proxy")))
+def test_init(factory):
+    t = ProxyServerManager(factory)
 
     assert t is not None
 
 
-def test_start_status_stop(tmp_path):
-    t = ProxyServerManager(str(tmp_path.joinpath("data/proxy")))
+def test_start_status_stop(factory):
+    t = ProxyServerManager(factory)
 
     assert t.start(UserConfig()) is not None
     s = t.get_status()

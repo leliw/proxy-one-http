@@ -2,17 +2,21 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 
 from app.config import UserConfig
+from app.dependencies import FactoryDep
 from app.features.proxy.proxy_model import Settings, Status
 from app.features.proxy.proxy_server_manager import ProxyServerManager
 
 
 router = APIRouter(tags=["Proxy server"])
 service = None
-def get_service():
+
+
+def get_service(factory: FactoryDep) -> ProxyServerManager:
     global service
     if not service:
-         service = ProxyServerManager("data/proxy")
+        service = ProxyServerManager(factory)
     return service
+
 
 ServiceDep = Annotated[ProxyServerManager, Depends(get_service)]
 

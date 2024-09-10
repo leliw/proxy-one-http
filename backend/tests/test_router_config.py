@@ -1,14 +1,10 @@
 from fastapi.testclient import TestClient
 import pytest
 
-from ampf.local.ampf_local_factory import AmpfLocalFactory
 from app.config import ServerConfig
 from app.dependencies import get_factory
 from app.main import app
 
-@pytest.fixture
-def factory(tmp_path):
-    return AmpfLocalFactory(tmp_path)
 
 @pytest.fixture
 def client(factory):
@@ -37,9 +33,12 @@ def test_user_config_default(client):
     assert 200 == result.status_code
     assert r["target_url"] == "http://example.com"
 
+
 def test_user_config_put_get(client):
-    result = client.put("/api/config/user", json={"target_url": "http://example.com.pl", "port": 8999})
-    
+    result = client.put(
+        "/api/config/user", json={"target_url": "http://example.com.pl", "port": 8999}
+    )
+
     assert 200 == result.status_code
 
     result = client.get("/api/config/user")

@@ -1,8 +1,9 @@
 import logging
 import threading
 
+from ampf.base.ampf_base_factory import AmpfBaseFactory
+from app import model
 from app.config import UserConfig
-from storage.directory_storage import DirectoryStorage
 
 from .proxy_model import Status
 from .stoppable_http_server import StoppableHttpServer
@@ -12,22 +13,22 @@ from .proxy_http import ProxyHTTP
 class ProxyServerManager:
     """Startuje i zatrzymuje serwer http"""
 
-    def __init__(self, storage_base_path: str) -> None:
-        self._port = None
+    def __init__(self, factory: AmpfBaseFactory) -> None:
+        self._factory = factory
+        self._log = logging.getLogger(__name__)
+
+        self._storage = None
         self._target_url = None
-        self._storage_base_path = storage_base_path
+        self._port = None
         self._httpd = None
         self._thread = None
-        self._log = logging.getLogger(__name__)
 
     def start(self, config: UserConfig) -> Status:
         """Starts proxy server"""
         self._port = config.port
         self._target_url = config.target_url
         sub_path = self._target_url.split("//")[-1].replace("/", "_")
-        self._storage = DirectoryStorage(
-            base_path=f"{self._storage_base_path}/{sub_path}"
-        )
+        self._storage = self._factory.create_storage(f"sessions/{sub_path}", model.Request, key_name="file_name")
         server_address = ("", self._port)
 
         def handler(*args, **kwargs):

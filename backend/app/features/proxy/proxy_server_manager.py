@@ -1,9 +1,10 @@
 import logging
 import threading
 
+from app.config import UserConfig
 from storage.directory_storage import DirectoryStorage
 
-from .proxy_model import DEFAULT_TARGET_URL, Status
+from .proxy_model import Status
 from .stoppable_http_server import StoppableHttpServer
 from .proxy_http import ProxyHTTP
 
@@ -11,33 +12,22 @@ from .proxy_http import ProxyHTTP
 class ProxyServerManager:
     """Startuje i zatrzymuje serwer http"""
 
-    def __init__(
-        self,
-        storage_base_path: str,
-        port: int = 8999,
-        target_url: str = DEFAULT_TARGET_URL,
-    ) -> None:
-        self._port = port
-        self._target_url = target_url
+    def __init__(self, storage_base_path: str) -> None:
+        self._port = None
+        self._target_url = None
         self._storage_base_path = storage_base_path
-        sub_path = self._target_url.split("//")[-1].replace("/", "_")
-        self._storage = DirectoryStorage(
-            base_path=f"{self._storage_base_path}/{sub_path}"
-        )
         self._httpd = None
         self._thread = None
         self._log = logging.getLogger(__name__)
 
-    def start(self, port: int = None, target_url: str = None) -> Status:
+    def start(self, config: UserConfig) -> Status:
         """Starts proxy server"""
-        if port:
-            self._port = port
-        if target_url:
-            self._target_url = target_url
-            sub_path = self._target_url.split("//")[-1].replace("/", "_")
-            self._storage = DirectoryStorage(
-                base_path=f"{self._storage_base_path}/{sub_path}"
-            )
+        self._port = config.port
+        self._target_url = config.target_url
+        sub_path = self._target_url.split("//")[-1].replace("/", "_")
+        self._storage = DirectoryStorage(
+            base_path=f"{self._storage_base_path}/{sub_path}"
+        )
         server_address = ("", self._port)
 
         def handler(*args, **kwargs):

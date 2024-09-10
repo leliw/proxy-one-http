@@ -6,7 +6,6 @@ from urllib.parse import urlparse
 from datetime import datetime
 import requests
 
-from app.config import UserConfig
 from storage import DirectoryStorage
 import app.model as model
 
@@ -15,8 +14,8 @@ import app.model as model
 class ProxyHTTP(ThreadingMixIn, SimpleHTTPRequestHandler):
     """Serwer proxy"""
 
-    def __init__(self, config: UserConfig, *args, **kwargs):
-        self.target_url = config.target_url
+    def __init__(self, *args, target_url: str, **kwargs):
+        self.target_url = target_url
         self._storage =  kwargs.pop('storage', DirectoryStorage())
         self._log = logging.getLogger(__name__)
         self._log.debug("Proxy for %s", self.target_url)

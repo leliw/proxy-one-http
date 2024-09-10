@@ -3,9 +3,8 @@
 import logging
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
-import app.proxy_http as proxy_http
 
-from app.routers import config
+from app.routers import config, proxy
 from app.static_files import static_file_response
 from storage.directory_storage import DirectoryStorage
 import app.model as model
@@ -14,8 +13,7 @@ logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("main_py")
 
 storage = DirectoryStorage(base_path="data/proxy")
-server_manager = proxy_http.ServerManager("data/proxy")
-server_manager.start()
+
 
 openapi_tags = [
     {
@@ -34,24 +32,7 @@ openapi_tags = [
 
 app = FastAPI(openapi_tags=openapi_tags)
 app.include_router(config.router, prefix="/api/config")
-
-
-@app.post("/api/proxy/start", tags=["Proxy"])
-async def proxy_start(settings: proxy_http.Settings):
-    """Starts the proxy server"""
-    return server_manager.start(port=settings.port, target_url=settings.target_url)
-
-
-@app.post("/api/proxy/stop", tags=["Proxy"])
-async def proxy_stop():
-    """Stops the proxy server"""
-    return server_manager.stop()
-
-
-@app.get("/api/proxy/status", tags=["Proxy"])
-async def proxy_status() -> proxy_http.Status:
-    """Returns porxy server status"""
-    return server_manager.get_status()
+app.include_router(proxy.router, prefix="/api/proxy")
 
 
 @app.get("/api/storage", tags=["Storage"])

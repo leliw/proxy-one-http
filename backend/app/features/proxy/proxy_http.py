@@ -1,23 +1,22 @@
 """Proxy Server"""
-from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+from http.server import SimpleHTTPRequestHandler
 import logging
 from socketserver import ThreadingMixIn
-import threading
 from urllib.parse import urlparse
 from datetime import datetime
 import requests
-from pydantic import BaseModel
 
+from app.config import UserConfig
 from storage import DirectoryStorage
 import app.model as model
 
-DEFAULT_TARGET_URL = 'https://example.com'
+
 
 class ProxyHTTP(ThreadingMixIn, SimpleHTTPRequestHandler):
     """Serwer proxy"""
 
-    def __init__(self, *args, **kwargs):
-        self.target_url = kwargs.pop('target_url', DEFAULT_TARGET_URL)  
+    def __init__(self, config: UserConfig, *args, **kwargs):
+        self.target_url = config.target_url
         self._storage =  kwargs.pop('storage', DirectoryStorage())
         self._log = logging.getLogger(__name__)
         self._log.debug("Proxy for %s", self.target_url)
@@ -107,74 +106,5 @@ class ProxyHTTP(ThreadingMixIn, SimpleHTTPRequestHandler):
         self.wfile.write(content)
 
 
-class StoppableHttpServer (ThreadingHTTPServer):
-    """http server that reacts to self.stop flag"""
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.stop = False
 
-    def serve_forever (self, poll_interval=0.5):
-        """Handle one request at a time until stopped."""
-        self.timeout = poll_interval
-        while not self.stop:
-            self.handle_request()
-
-class Settings(BaseModel):
-    """Proxy server setting"""
-    port: int = 8999
-    target_url: str = DEFAULT_TARGET_URL
-
-class Status(Settings):
-    """Proxy server status"""
-    status: str
-
-class ServerManager:
-    """Startuje i zatrzymuje serwer http"""
-    def __init__(self, storage_base_path: str, port: int = 8999, target_url: str = DEFAULT_TARGET_URL) -> None:
-        self._port = port
-        self._target_url = target_url
-        self._storage_base_path = storage_base_path
-        sub_path = self._target_url.split("//")[-1].replace("/", "_")
-        self._storage  = DirectoryStorage(base_path=f"{self._storage_base_path}/{sub_path}")
-        self._httpd = None
-        self._thread = None
-        self._log = logging.getLogger(__name__)
-
-    def start(self, port: int = None, target_url: str = None) -> Status:
-        """Starts proxy server"""
-        if port:
-            self._port = port
-        if target_url:
-            self._target_url = target_url
-            sub_path = self._target_url.split("//")[-1].replace("/", "_")
-            self._storage  = DirectoryStorage(base_path=f"{self._storage_base_path}/{sub_path}")
-        server_address = ('', self._port)
-
-        def handler(*args, **kwargs):
-            return ProxyHTTP(*args, target_url=self._target_url, storage=self._storage, **kwargs)
-
-        self._httpd = StoppableHttpServer(server_address, handler)
-        self._thread = threading.Thread(target=self._httpd.serve_forever, name="HttpServer", daemon=True)
-        self._thread.start()
-        self._log.info('Started http proxy on port %d => %s', self._port, self._target_url)
-        return self.get_status()
-
-    def stop(self) -> Status:
-        """Stops proxy server"""
-        if self._httpd:
-            self._log.debug("Stopping server ...")
-            self._httpd.stop = True
-            self._httpd.server_close()
-            self._thread.join()
-            self._httpd = None
-            self._log.info("Server stopped.")
-        return self.get_status()
-
-    def get_status(self) -> Status:
-        """Returns proxy server status"""
-        return Status(**{
-            "status" : "working" if self._httpd else "stopped",
-            "port" : self._port,
-            "target_url" : self._target_url
-        })

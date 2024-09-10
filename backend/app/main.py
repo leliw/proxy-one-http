@@ -17,10 +17,6 @@ storage = DirectoryStorage(base_path="data/proxy")
 
 openapi_tags = [
     {
-        "name": "Proxy",
-        "description": "Proxy server",
-    },
-    {
         "name": "Storage",
         "description": "Stored requests",
     },

@@ -7,7 +7,7 @@ from datetime import datetime
 
 
 class Request(BaseModel):
-    """Model for request sotored in JSON format"""
+    """Model for request stored in JSON format"""
     start: datetime = Field(default_factory=datetime.now)
     end: Optional[datetime] = None
     url: str

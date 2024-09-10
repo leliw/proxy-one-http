@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel
 
 
@@ -11,7 +12,9 @@ class Settings(BaseModel):
     target_url: str = DEFAULT_TARGET_URL
 
 
-class Status(Settings):
+class Status(BaseModel):
     """Proxy server status"""
 
     status: str
+    target_url: Optional[str] = None
+    port: Optional[int] = None

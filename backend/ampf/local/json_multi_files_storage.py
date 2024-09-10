@@ -29,11 +29,13 @@ class JsonMultiFilesStorage[T](BaseStorage[T], FileStorage):
         self._log = logging.getLogger(__name__)
 
     def put(self, key: str, value: T) -> None:
+        self._log.debug("put: %s", key)
         json_str = value.model_dump_json(by_alias=True, indent=2, exclude_none=True)
         with open(self._key_to_full_path(key), "w", encoding="utf-8") as file:
             file.write(json_str)
 
     def get(self, key: str) -> T:
+        self._log.debug("get %s", key)
         full_path = self._key_to_full_path(key)
         try:
             with open(full_path, "r", encoding="utf-8") as file:
@@ -43,18 +45,22 @@ class JsonMultiFilesStorage[T](BaseStorage[T], FileStorage):
             return None
 
     def keys(self) -> Iterator[str]:
-        start_index = len(str(self.folder_path))+1
+        self._log.debug("keys -> start")
+        start_index = len(str(self.folder_path)) + 1
         if self.subfolder_characters:
-            end_index = self.subfolder_characters+1
+            end_index = self.subfolder_characters + 1
         else:
             end_index = 1
         for root, _, files in os.walk(self.folder_path):
-            folder = root[start_index:-end_index]    
+            folder = root[start_index:-end_index]
             for file in files:
                 k = f"{folder}/{file}" if folder else file
+                self._log.debug("keys: %s", k)
                 yield k[:-5] if k.endswith(".json") else k
+        self._log.debug("keys <- end")
 
     def delete(self, key: str) -> None:
+        self._log.debug("delete %s", key)
         full_path = self._key_to_full_path(key)
         os.remove(full_path)
 

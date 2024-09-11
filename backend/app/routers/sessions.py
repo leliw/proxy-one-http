@@ -3,6 +3,7 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends
 
+from app.dependencies import ServerConfigDep
 from app.features.sessions import session_model
 from storage.directory_storage import DirectoryStorage
 
@@ -10,8 +11,8 @@ from storage.directory_storage import DirectoryStorage
 router = APIRouter(tags=["Sessions storage"])
 
 
-def get_service():
-    return DirectoryStorage(base_path="data/proxy")
+def get_service(config: ServerConfigDep):
+    return DirectoryStorage(base_path=f"{config.data_dir}/proxy")
 
 
 ServiceDep = Annotated[DirectoryStorage, Depends(get_service)]

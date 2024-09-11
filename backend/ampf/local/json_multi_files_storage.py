@@ -50,9 +50,9 @@ class JsonMultiFilesStorage[T](BaseStorage[T], FileStorage):
         if self.subfolder_characters:
             end_index = self.subfolder_characters + 1
         else:
-            end_index = 1
+            end_index = None
         for root, _, files in os.walk(self.folder_path):
-            folder = root[start_index:-end_index]
+            folder = root[start_index:-end_index] if end_index else root[start_index:]
             for file in files:
                 k = f"{folder}/{file}" if folder else file
                 self._log.debug("keys: %s", k)

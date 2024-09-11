@@ -50,6 +50,7 @@ def test_start_status_stop(session_service, tmp_port):
 
 
 def test_get_request(server_manager, session_service, tmp_port):
+    logging.getLogger("ampf.local.json_multi_files_storage")
     response = requests.get(f"http://localhost:{tmp_port}")
 
     assert 200 == response.status_code

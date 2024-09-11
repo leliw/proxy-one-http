@@ -44,6 +44,6 @@ class SessionService:
             ]
         )
         storage = self._factory.create_storage(
-            f"requests/{self._current_session.session_id}", SessionRequest
+            f"sessions/{self._current_session.session_id}", SessionRequest
         )
         storage.put(file_name, req)

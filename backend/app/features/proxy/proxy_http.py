@@ -45,12 +45,6 @@ class ProxyHTTP(ThreadingMixIn, SimpleHTTPRequestHandler):
         self._process_response(response)
         self._save_request(req, response)
 
-    def do_QUIT (self):
-        """send 200 OK response, and set server.stop to True"""
-        self.send_response(200)
-        self.end_headers()
-        self.server.stop = True
-
     def _create_headers(self) -> dict:
         """Pobranie nagłówków aktualnego żądania i zwrócenie ich jako dict"""
         headers = {key: val for key, val in self.headers.items()}

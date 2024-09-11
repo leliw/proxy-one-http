@@ -1,29 +1,28 @@
-
-
 from typing import Annotated
 from fastapi import APIRouter, Depends
 
-from app.dependencies import ServerConfigDep
+from ampf.base.base_storage import BaseStorage
+from app.dependencies import FactoryDep
 from app.features.sessions import session_model
-from storage.directory_storage import DirectoryStorage
 
 
 router = APIRouter(tags=["Sessions storage"])
 
 
-def get_service(config: ServerConfigDep):
-    return DirectoryStorage(base_path=f"{config.data_dir}/proxy")
+def get_service(factory: FactoryDep):
+    return factory.create_storage("proxy", session_model.Request, key_name="file_name")
 
 
-ServiceDep = Annotated[DirectoryStorage, Depends(get_service)]
+ServiceDep = Annotated[BaseStorage, Depends(get_service)]
+
 
 @router.get("")
-async def get_keys(service: ServiceDep, path: str = None) -> list[str]:
+async def get_keys(service: ServiceDep) -> list[str]:
     """Returns list of folders"""
-    return service.keys(sub_path=path)
+    return service.keys()
 
 
 @router.get("/{key}")
-async def get_key(service: ServiceDep, key: str, path: str = None) -> session_model.Request:
+async def get_key(service: ServiceDep, key: str) -> session_model.Request:
     """Returns file content"""
-    return session_model.Request.parse_obj(service.get(key=key, sub_path=path, file_ext="json"))
+    return service.get(key)

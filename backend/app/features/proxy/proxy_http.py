@@ -6,17 +6,17 @@ from urllib.parse import urlparse
 from datetime import datetime
 import requests
 
-from ampf.base.base_storage import BaseStorage
 from  app.features.sessions.session_model import SessionRequest
+from app.features.sessions.session_service import SessionService
 
 
 
 class ProxyHTTP(ThreadingMixIn, SimpleHTTPRequestHandler):
     """Serwer proxy"""
 
-    def __init__(self, *args, storage: BaseStorage[SessionRequest], target_url: str, **kwargs):
+    def __init__(self, *args, session_serivce: SessionService, target_url: str, **kwargs):
         self.target_url = target_url
-        self._storage =  storage
+        self.session_service =  session_serivce
         self._log = logging.getLogger(__name__)
         self._log.debug("Proxy for %s", self.target_url)
         super().__init__(*args, **kwargs)
@@ -82,7 +82,7 @@ class ProxyHTTP(ThreadingMixIn, SimpleHTTPRequestHandler):
             req.url.replace("/", "_"),
             str(req.status_code)
             ])
-        self._storage.put(key=file_name, value=req)
+        self.session_service.put(file_name, req)
     
     def _process_response(self, response: requests.Response):
         # Jeśli odpowiedź jest skompresowana, to usuwamy nagłówek Content-Encoding

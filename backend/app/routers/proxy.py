@@ -2,19 +2,19 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 
 from app.config import UserConfig
-from app.dependencies import FactoryDep
 from app.features.proxy.proxy_model import Settings, Status
 from app.features.proxy.proxy_server_manager import ProxyServerManager
+from app.routers.sessions import SessionServiceDep
 
 
 router = APIRouter(tags=["Proxy server"])
 service = None
 
 
-def get_service(factory: FactoryDep) -> ProxyServerManager:
+def get_service(session_service: SessionServiceDep) -> ProxyServerManager:
     global service
     if not service:
-        service = ProxyServerManager(factory)
+        service = ProxyServerManager(session_service)
     return service
 
 

@@ -1,9 +1,8 @@
 import logging
 import threading
 
-from ampf.base.ampf_base_factory import AmpfBaseFactory
 from app.config import UserConfig
-from app.features.sessions.session_model import SessionRequest
+from app.features.sessions.session_service import SessionService
 
 from .proxy_model import Status
 from .stoppable_http_server import StoppableHttpServer
@@ -13,11 +12,10 @@ from .proxy_http import ProxyHTTP
 class ProxyServerManager:
     """Startuje i zatrzymuje serwer http"""
 
-    def __init__(self, factory: AmpfBaseFactory) -> None:
-        self._factory = factory
+    def __init__(self, session_service: SessionService) -> None:
+        self.session_serivce = session_service
         self._log = logging.getLogger(__name__)
 
-        self._storage = None
         self._target_url = None
         self._port = None
         self._httpd = None
@@ -27,13 +25,14 @@ class ProxyServerManager:
         """Starts proxy server"""
         self._port = config.port
         self._target_url = config.target_url
-        sub_path = self._target_url.split("//")[-1].replace("/", "_")
-        self._storage = self._factory.create_storage(f"sessions/{sub_path}", SessionRequest, key_name="file_name")
         server_address = ("", self._port)
 
         def handler(*args, **kwargs):
             return ProxyHTTP(
-                *args, target_url=self._target_url, storage=self._storage, **kwargs
+                *args,
+                target_url=self._target_url,
+                session_serivce=self.session_serivce,
+                **kwargs,
             )
 
         self._httpd = StoppableHttpServer(server_address, handler)

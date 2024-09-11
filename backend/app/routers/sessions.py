@@ -13,16 +13,16 @@ def get_service(factory: FactoryDep) -> SessionService:
     return SessionService(factory)
 
 
-ServiceDep = Annotated[SessionService, Depends(get_service)]
+SessionServiceDep = Annotated[SessionService, Depends(get_service)]
 
 
 @router.get("")
-async def get_all(service: ServiceDep) -> list[str]:
+async def get_all(service: SessionServiceDep) -> list[str]:
     """Returns list of folders"""
     return service.get_all()
 
 
 @router.get("/{key}")
-async def get(service: ServiceDep, key: str) -> SessionRequest:
+async def get(service: SessionServiceDep, key: str) -> SessionRequest:
     """Returns file content"""
     return service.get(key)

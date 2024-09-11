@@ -29,9 +29,10 @@ class JsonMultiFilesStorage[T](BaseStorage[T], FileStorage):
         self._log = logging.getLogger(__name__)
 
     def put(self, key: str, value: T) -> None:
-        self._log.debug("put: %s", key)
+        full_path = self._key_to_full_path(key)
+        self._log.debug("put: %s (%s)", key, full_path)
         json_str = value.model_dump_json(by_alias=True, indent=2, exclude_none=True)
-        with open(self._key_to_full_path(key), "w", encoding="utf-8") as file:
+        with open(full_path, "w", encoding="utf-8") as file:
             file.write(json_str)
 
     def get(self, key: str) -> T:
@@ -45,13 +46,14 @@ class JsonMultiFilesStorage[T](BaseStorage[T], FileStorage):
             return None
 
     def keys(self) -> Iterator[str]:
-        self._log.debug("keys -> start")
+        self._log.debug("keys -> start %s", self.folder_path)
         start_index = len(str(self.folder_path)) + 1
         if self.subfolder_characters:
             end_index = self.subfolder_characters + 1
         else:
             end_index = None
         for root, _, files in os.walk(self.folder_path):
+            self._log.debug("keys -> walk %s %d", root, len(files))
             folder = root[start_index:-end_index] if end_index else root[start_index:]
             for file in files:
                 k = f"{folder}/{file}" if folder else file

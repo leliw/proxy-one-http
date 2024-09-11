@@ -56,11 +56,14 @@ class ProxyServerManager:
             self._log.info("Server stopped.")
         return self.get_status()
 
+    def is_stopped(self) -> bool:
+        return not bool(self._httpd)
+    
     def get_status(self) -> ProxyStatus:
         """Returns proxy server status"""
         return ProxyStatus(
             **{
-                "status": "working" if self._httpd else "stopped",
+                "status": "stopped" if self.is_stopped() else "working",
                 "port": self._port,
                 "target_url": self._target_url,
             }

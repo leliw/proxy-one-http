@@ -8,14 +8,15 @@ from app.routers.sessions import SessionServiceDep
 
 
 router = APIRouter(tags=["Proxy server"])
-service = None
-
+# The same object has to be accessible between requests
+proxy_service_manager: ProxyServerManager = None
 
 def get_service(session_service: SessionServiceDep) -> ProxyServerManager:
-    global service
-    if not service:
-        service = ProxyServerManager(session_service)
-    return service
+    global proxy_service_manager
+    if not proxy_service_manager or proxy_service_manager.is_stopped():
+        proxy_service_manager = ProxyServerManager(session_service)
+        # For tests service is recreated when is stopped - storage changes root dir between tests
+    return proxy_service_manager
 
 
 ServiceDep = Annotated[ProxyServerManager, Depends(get_service)]

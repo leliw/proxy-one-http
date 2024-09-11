@@ -2,7 +2,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 
 from app.dependencies import FactoryDep
-from app.features.sessions.session_model import SessionRequest
+from app.features.sessions.session_model import Session, SessionRequest
 from app.features.sessions.session_service import SessionService
 
 
@@ -23,6 +23,6 @@ async def get_all(service: SessionServiceDep) -> list[str]:
 
 
 @router.get("/{key}")
-async def get(service: SessionServiceDep, key: str) -> SessionRequest:
+async def get(service: SessionServiceDep, key: str) -> Session:
     """Returns file content"""
     return service.get(key)

@@ -58,9 +58,9 @@ def test_get_request(server_manager, session_service, tmp_port):
     time.sleep(0.1)
     keys = session_service.get_all()
     assert 1 == len(keys)
-    assert "GET" in keys[0]
+
     item = session_service.get(keys[0])
-    assert "GET" == item.method
+    assert "http://example.com" == item.target_url
 
 
 def test_post_request(server_manager, session_service, tmp_port):
@@ -72,9 +72,8 @@ def test_post_request(server_manager, session_service, tmp_port):
     time.sleep(0.1)
     keys = session_service.get_all()
     assert 1 == len(keys)
-    assert "POST" in keys[0]
     item = session_service.get(keys[0])
-    assert "POST" == item.method
+    assert "http://example.com" == item.target_url
 
 
 # def test_put_request(server_manager):

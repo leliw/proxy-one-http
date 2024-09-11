@@ -70,13 +70,7 @@ class ProxyHTTP(ThreadingMixIn, SimpleHTTPRequestHandler):
         req.set_reqest_body(req.request_headers.get("Content-Type"), response.request.body)
         req.set_response_body(req.response_headers.get("Content-Type"), response.content)
 
-        file_name = "_".join([
-            str(req.start).replace(" ", "/"),
-            req.method,
-            req.url.replace("/", "_"),
-            str(req.status_code)
-            ])
-        self.session_service.put(file_name, req)
+        self.session_service.add(req)
     
     def _process_response(self, response: requests.Response):
         # Jeśli odpowiedź jest skompresowana, to usuwamy nagłówek Content-Encoding

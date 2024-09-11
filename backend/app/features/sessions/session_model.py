@@ -1,13 +1,23 @@
 import json
 from typing import Optional
 from urllib.parse import parse_qs
+import uuid
 from bs4 import BeautifulSoup
 from pydantic import BaseModel, Field
-from datetime import datetime
+from datetime import datetime, date
+
+
+class Session(BaseModel):
+    session_id: Optional[str] = Field(default_factory=lambda: str(uuid.uuid4()))
+    session_date: Optional[date] = Field(default_factory=lambda: datetime.now().date())
+    target_url: str
+    requests_cnt: Optional[int] = 0
+    description: Optional[str] = None
 
 
 class SessionRequest(BaseModel):
     """Model for request stored in JSON format"""
+
     start: datetime = Field(default_factory=datetime.now)
     end: Optional[datetime] = None
     url: str
@@ -26,7 +36,7 @@ class SessionRequest(BaseModel):
         """Formats and sets request_body"""
         content_type = content_type.lower() if body else None
         if body and "charset=utf-8" in content_type:
-            body_str = body.decode('utf-8')
+            body_str = body.decode("utf-8")
             if "application/x-www-form-urlencoded" in content_type:
                 body_dict = parse_qs(body_str)
                 for el in body_dict.items():
@@ -42,12 +52,12 @@ class SessionRequest(BaseModel):
         """Formats and sets response body"""
         content_type = content_type.lower() if body else None
         if body and "charset=utf-8" in content_type:
-            body_str = body.decode('utf-8')
+            body_str = body.decode("utf-8")
             if "application/json" in content_type or "text/json" in content_type:
                 body_dict = json.loads(body_str)
                 self.response_body_json = body_dict
             elif "text/html" in content_type:
-                soup = BeautifulSoup(body_str, 'html.parser')
+                soup = BeautifulSoup(body_str, "html.parser")
                 body_str = soup.prettify()
                 self.response_body_str = body_str.replace("\r", "")
             else:

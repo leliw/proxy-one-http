@@ -26,7 +26,7 @@ class ProxyServerManager:
         self._port = config.port
         self._target_url = config.target_url
         server_address = ("", self._port)
-
+        self.session_serivce.start_session(config.target_url)
         def handler(*args, **kwargs):
             return ProxyHTTP(
                 *args,
@@ -54,6 +54,7 @@ class ProxyServerManager:
             self._thread.join()
             self._httpd = None
             self._log.info("Server stopped.")
+        self.session_serivce.stop_session()
         return self.get_status()
 
     def is_stopped(self) -> bool:

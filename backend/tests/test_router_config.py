@@ -1,15 +1,4 @@
-from fastapi.testclient import TestClient
-import pytest
-
 from app.config import ServerConfig
-from app.dependencies import get_factory
-from app.main import app
-
-
-@pytest.fixture
-def client(factory):
-    app.dependency_overrides[get_factory] = lambda: factory
-    return TestClient(app)
 
 
 def test_server_config_default_values():

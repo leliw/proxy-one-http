@@ -2,7 +2,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 
 from app.config import UserConfig
-from app.features.proxy.proxy_model import Settings, Status
+from app.features.proxy.proxy_model import ProxySettings, ProxyStatus
 from app.features.proxy.proxy_server_manager import ProxyServerManager
 from app.routers.sessions import SessionServiceDep
 
@@ -22,7 +22,7 @@ ServiceDep = Annotated[ProxyServerManager, Depends(get_service)]
 
 
 @router.post("/start")
-async def proxy_start(service: ServiceDep, settings: Settings):
+async def proxy_start(service: ServiceDep, settings: ProxySettings):
     """Starts the proxy server"""
     return service.start(UserConfig(port=settings.port, target_url=settings.target_url))
 
@@ -34,6 +34,6 @@ async def proxy_stop(service: ServiceDep):
 
 
 @router.get("/status")
-async def proxy_status(service: ServiceDep) -> Status:
+async def proxy_status(service: ServiceDep) -> ProxyStatus:
     """Returns porxy server status"""
     return service.get_status()

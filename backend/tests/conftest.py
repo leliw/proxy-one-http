@@ -1,10 +1,16 @@
+import random
 from fastapi.testclient import TestClient
 import pytest
 
 from ampf.local.ampf_local_factory import AmpfLocalFactory
-from  app.main import app
+from app.main import app
 from app.config import ServerConfig
 from app.dependencies import get_factory, get_server_config
+
+
+@pytest.fixture
+def tmp_port():
+    return random.randint(8000, 8998)
 
 
 @pytest.fixture
@@ -15,6 +21,7 @@ def server_config(tmp_path) -> ServerConfig:
 @pytest.fixture
 def factory(tmp_path):
     return AmpfLocalFactory(tmp_path)
+
 
 @pytest.fixture
 def client(factory, server_config):

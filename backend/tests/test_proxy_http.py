@@ -15,17 +15,22 @@ def session_service(factory):
     logging.getLogger("ampf.local.json_multi_files_storage").setLevel(logging.DEBUG)
     return SessionService(factory)
 
+
 @pytest.fixture
-def server_manager(session_service):
+def server_manager(session_service, tmp_port):
     sm = ProxyServerManager(session_service)
-    sm.start(UserConfig(target_url="http://example.com", port=8999))
+    sm.start(UserConfig(target_url="http://example.com", port=tmp_port))
     yield sm
     sm.stop()
+
 
 @pytest.fixture
 def storage(factory) -> BaseStorage[SessionRequest]:
     sub_path = "example.com/" + datetime.now().strftime("%Y-%m-%d")
-    return factory.create_storage(f"sessions/{sub_path}", SessionRequest, key_name="file_name")
+    return factory.create_storage(
+        f"sessions/{sub_path}", SessionRequest, key_name="file_name"
+    )
+
 
 def test_init(session_service):
     t = ProxyServerManager(session_service)
@@ -33,10 +38,10 @@ def test_init(session_service):
     assert t is not None
 
 
-def test_start_status_stop(session_service):
+def test_start_status_stop(session_service, tmp_port):
     t = ProxyServerManager(session_service)
 
-    assert t.start(UserConfig()) is not None
+    assert t.start(UserConfig(port=tmp_port)) is not None
     s = t.get_status()
     assert s.status == "working"
     assert t.stop() is not None
@@ -44,8 +49,8 @@ def test_start_status_stop(session_service):
     assert s.status == "stopped"
 
 
-def test_get_request(server_manager, session_service):
-    response = requests.get("http://localhost:8999")
+def test_get_request(server_manager, session_service, tmp_port):
+    response = requests.get(f"http://localhost:{tmp_port}")
 
     assert 200 == response.status_code
     assert "<title>Example Domain</title>" in response.text
@@ -58,9 +63,8 @@ def test_get_request(server_manager, session_service):
     assert "GET" == item.method
 
 
-
-def test_post_request(server_manager, session_service):
-    response = requests.post("http://localhost:8999", json={"test": "test"})
+def test_post_request(server_manager, session_service, tmp_port):
+    response = requests.post(f"http://localhost:{tmp_port}", json={"test": "test"})
 
     assert 200 == response.status_code
     assert "<title>Example Domain</title>" in response.text
@@ -71,7 +75,6 @@ def test_post_request(server_manager, session_service):
     assert "POST" in keys[0]
     item = session_service.get(keys[0])
     assert "POST" == item.method
-
 
 
 # def test_put_request(server_manager):

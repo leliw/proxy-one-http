@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 from datetime import datetime
 
 
-class Request(BaseModel):
+class SessionRequest(BaseModel):
     """Model for request stored in JSON format"""
     start: datetime = Field(default_factory=datetime.now)
     end: Optional[datetime] = None

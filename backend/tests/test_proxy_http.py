@@ -4,9 +4,9 @@ import logging
 import pytest
 import requests
 from ampf.base.base_storage import BaseStorage
-from app.features.sessions import session_model
 from app.config import UserConfig
 from app.features.proxy.proxy_server_manager import ProxyServerManager
+from app.features.sessions.session_model import SessionRequest
 
 
 @pytest.fixture
@@ -17,10 +17,10 @@ def server_manager(factory):
     sm.stop()
 
 @pytest.fixture
-def storage(factory) -> BaseStorage[session_model.Request]:
+def storage(factory) -> BaseStorage[SessionRequest]:
     logging.getLogger("ampf.local.json_multi_files_storage").setLevel(logging.DEBUG)
     sub_path = "example.com/" + datetime.now().strftime("%Y-%m-%d")
-    return factory.create_storage(f"sessions/{sub_path}", session_model.Request, key_name="file_name")
+    return factory.create_storage(f"sessions/{sub_path}", SessionRequest, key_name="file_name")
 
 def test_init(factory):
     t = ProxyServerManager(factory)

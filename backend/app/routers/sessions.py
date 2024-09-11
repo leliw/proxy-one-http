@@ -10,7 +10,7 @@ router = APIRouter(tags=["Sessions storage"])
 
 
 def get_service(factory: FactoryDep):
-    return factory.create_storage("proxy", session_model.Request, key_name="file_name")
+    return factory.create_storage("proxy", session_model.SessionRequest, key_name="file_name")
 
 
 ServiceDep = Annotated[BaseStorage, Depends(get_service)]
@@ -23,6 +23,6 @@ async def get_keys(service: ServiceDep) -> list[str]:
 
 
 @router.get("/{key}")
-async def get_key(service: ServiceDep, key: str) -> session_model.Request:
+async def get_key(service: ServiceDep, key: str) -> session_model.SessionRequest:
     """Returns file content"""
     return service.get(key)

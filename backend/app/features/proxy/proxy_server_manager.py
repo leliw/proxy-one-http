@@ -2,7 +2,7 @@ import logging
 import threading
 
 from ampf.base.ampf_base_factory import AmpfBaseFactory
-from app import model
+from app.features.sessions import session_model
 from app.config import UserConfig
 
 from .proxy_model import Status
@@ -28,7 +28,7 @@ class ProxyServerManager:
         self._port = config.port
         self._target_url = config.target_url
         sub_path = self._target_url.split("//")[-1].replace("/", "_")
-        self._storage = self._factory.create_storage(f"sessions/{sub_path}", model.Request, key_name="file_name")
+        self._storage = self._factory.create_storage(f"sessions/{sub_path}", session_model.Request, key_name="file_name")
         server_address = ("", self._port)
 
         def handler(*args, **kwargs):

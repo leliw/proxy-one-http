@@ -7,14 +7,14 @@ from datetime import datetime
 import requests
 
 from ampf.base.base_storage import BaseStorage
-import app.model as model
+import app.features.sessions.session_model as session_model
 
 
 
 class ProxyHTTP(ThreadingMixIn, SimpleHTTPRequestHandler):
     """Serwer proxy"""
 
-    def __init__(self, *args, storage: BaseStorage[model.Request], target_url: str, **kwargs):
+    def __init__(self, *args, storage: BaseStorage[session_model.Request], target_url: str, **kwargs):
         self.target_url = target_url
         self._storage =  storage
         self._log = logging.getLogger(__name__)
@@ -24,7 +24,7 @@ class ProxyHTTP(ThreadingMixIn, SimpleHTTPRequestHandler):
     def do_GET(self):
         """Wykonanie zapytania GET do serwera docelowego"""
         self._log.debug("GET %s%s", self.target_url, self.path) 
-        req = model.Request(url=self.path, method="GET")
+        req = session_model.Request(url=self.path, method="GET")
         response = requests.get(self.target_url + self.path, headers=self._create_headers(), allow_redirects=False)
         self._process_response(response)
         self._save_request(req, response)
@@ -32,7 +32,7 @@ class ProxyHTTP(ThreadingMixIn, SimpleHTTPRequestHandler):
     def do_POST(self):
         """Wykonanie zapytania POST do serwera docelowego"""
         self._log.debug("POST %s%s", self.target_url, self.path) 
-        req = model.Request(url=self.path, method="POST")
+        req = session_model.Request(url=self.path, method="POST")
         response = requests.post(self.target_url + self.path, data=self._create_data(), headers=self._create_headers(), allow_redirects=False)
         self._process_response(response)
         self._save_request(req, response)
@@ -40,7 +40,7 @@ class ProxyHTTP(ThreadingMixIn, SimpleHTTPRequestHandler):
     def do_PUT(self):
         """Wykonanie zapytania PUT do serwera docelowego"""
         self._log.debug("PUT %s%s", self.target_url, self.path) 
-        req = model.Request(url=self.path, method="PUT")
+        req = session_model.Request(url=self.path, method="PUT")
         response = requests.put(self.target_url + self.path, data=self._create_data(), headers=self._create_headers(), allow_redirects=False)
         self._process_response(response)
         self._save_request(req, response)
@@ -68,7 +68,7 @@ class ProxyHTTP(ThreadingMixIn, SimpleHTTPRequestHandler):
         content_length = int(self.headers['Content-Length'])
         return self.rfile.read(content_length)
     
-    def _save_request(self, req: model.Request, response: requests.Response):
+    def _save_request(self, req: session_model.Request, response: requests.Response):
         req.status_code = response.status_code
         req.end = datetime.now()
         req.request_headers = {key: val for key, val in sorted(response.request.headers.items(), key=lambda e: e[0])}

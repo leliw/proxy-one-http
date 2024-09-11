@@ -3,7 +3,7 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends
 
-from app import model
+from app.features.sessions import session_model
 from storage.directory_storage import DirectoryStorage
 
 
@@ -23,6 +23,6 @@ async def get_keys(service: ServiceDep, path: str = None) -> list[str]:
 
 
 @router.get("/{key}")
-async def get_key(service: ServiceDep, key: str, path: str = None) -> model.Request:
+async def get_key(service: ServiceDep, key: str, path: str = None) -> session_model.Request:
     """Returns file content"""
-    return model.Request.parse_obj(service.get(key=key, sub_path=path, file_ext="json"))
+    return session_model.Request.parse_obj(service.get(key=key, sub_path=path, file_ext="json"))

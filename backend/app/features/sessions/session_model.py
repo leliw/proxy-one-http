@@ -15,14 +15,17 @@ class Session(BaseModel):
     description: Optional[str] = None
 
 
-class SessionRequest(BaseModel):
-    """Model for request stored in JSON format"""
-
+class SessionRequestHeader(BaseModel):
     start: datetime = Field(default_factory=datetime.now)
     end: Optional[datetime] = None
     url: str
     method: str
     status_code: Optional[int] = None
+
+
+class SessionRequest(SessionRequestHeader):
+    """Model for request stored in JSON format"""
+
     request_headers: dict = {}
     request_body_form: Optional[dict] = None
     request_body_str: Optional[str] = None

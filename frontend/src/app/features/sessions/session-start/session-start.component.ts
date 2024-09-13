@@ -1,8 +1,9 @@
-import { Component, signal, ViewChild } from '@angular/core';
+import { Component, inject, signal, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { SessionStartFormComponent } from "../session-start-form/session-start-form.component";
+import { ProxyService } from '../../proxy/proxy.service';
 
 @Component({
     selector: 'app-session-start',
@@ -18,17 +19,20 @@ import { SessionStartFormComponent } from "../session-start-form/session-start-f
 })
 export class SessionStartComponent {
     @ViewChild(SessionStartFormComponent) paramsForm!: SessionStartFormComponent;
+    service = inject(ProxyService);
     status = signal("READY");
     percent = signal(0);
 
     start(): void {
-        const params = this.paramsForm.onSubmit();
-        if (params) {
-            this.status.set('IN PROGRESS');
-        }
+        const proxySettings = this.paramsForm.onSubmit();
+        if (proxySettings)
+            this.service.start(proxySettings).subscribe(() => {
+                this.status.set('IN PROGRESS');
+                window.open(`http://localhost:${proxySettings.port}`, "proxy")
+            });
     }
 
     stop(): void {
-        this.status.set('CANCELED');
+        this.service.stop().subscribe(() => this.status.set('CANCELED'));
     }
 }

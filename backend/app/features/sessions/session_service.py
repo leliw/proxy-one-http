@@ -1,6 +1,8 @@
+import logging
 from typing import List
 from ampf.base.ampf_base_factory import AmpfBaseFactory
 from app.features.sessions.session_model import Session, SessionRequest
+from app.features.sessions.session_request_service import SessionRequestService
 
 
 class SessionService:
@@ -8,6 +10,7 @@ class SessionService:
         self._current_session: Session = None
         self._factory = factory
         self.storage = factory.create_storage("sessions", Session)
+        self._log = logging.getLogger(__name__)
 
     # def get_all(self) -> List[Session]:
     #     return [Session(**i.model_dump(by_alias=True)) for i in self.storage.get_all()]
@@ -17,6 +20,11 @@ class SessionService:
 
     def get(self, key: str) -> Session:
         return self.storage.get(key)
+
+    def create_request_service(self, session_id: str = None) -> SessionRequestService:
+        return SessionRequestService(
+            self._factory, session_id or self._current_session.session_id
+        )
 
     def start_session(self, target_url: str, description: str = None):
         """Starts session"""
@@ -31,19 +39,4 @@ class SessionService:
         """Adds request in current session"""
         self._current_session.requests_cnt += 1
         self.storage.save(self._current_session)
-        self.save_req(req)
-
-    def save_req(self, req: SessionRequest):
-        """Saves request within session"""
-        file_name = "_".join(
-            [
-                str(req.start).replace(" ", "_"),
-                req.method,
-                req.url.replace("/", "_"),
-                str(req.status_code),
-            ]
-        )
-        storage = self._factory.create_storage(
-            f"sessions/{self._current_session.session_id}", SessionRequest
-        )
-        storage.put(file_name, req)
+        self.create_request_service().post(req)

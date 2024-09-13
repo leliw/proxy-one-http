@@ -1,3 +1,4 @@
+import logging
 import pytest
 
 from app.features.sessions.session_model import Session, SessionRequest
@@ -35,3 +36,9 @@ def test_get_one(client, session_service):
     assert 200 == result.status_code
     r = Session(**result.json())
     assert 1 == r.requests_cnt
+
+    result = client.get(f"/api/sessions/{key}/requests")
+
+    assert 200 == result.status_code
+    r = result.json()
+    assert 1 == len(r)

@@ -21,8 +21,8 @@
           <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
         </button>
       }
-      <span>frontend</span>
+      <span>{{service.title()}}</span>
     </mat-toolbar>
-    <!-- Add Content Here -->
-  </mat-sidenav-content>
+    <router-outlet></router-outlet>
+</mat-sidenav-content>
 </mat-sidenav-container>

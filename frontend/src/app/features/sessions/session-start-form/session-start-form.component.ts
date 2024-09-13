@@ -4,7 +4,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 
 export interface Parameters {
-    name: string;
+    target_url: string;
+    port: number
 }
 @Component({
     selector: 'app-session-start-form',
@@ -21,7 +22,8 @@ export interface Parameters {
 export class SessionStartFormComponent {
     fb = inject(FormBuilder);
     form = this.fb.nonNullable.group({
-        name: ['', [Validators.required, Validators.minLength(2)]],
+        target_url: ['https://', [Validators.required, Validators.minLength(10)]],
+        port: [8999, [Validators.required, Validators.min(8000), Validators.max(8999)]]
     })
 
     onSubmit(): Parameters | undefined {

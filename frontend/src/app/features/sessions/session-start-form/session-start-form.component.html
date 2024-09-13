@@ -1,6 +1,10 @@
 <form [formGroup]="form"    >
     <mat-form-field class="full-width">
-        <mat-label>Nazwa</mat-label>
-        <input matInput placeholder="Nazwa" formControlName="name" autofocus>
+        <mat-label>Adres docelowy</mat-label>
+        <input matInput placeholder="Adres docelowy" formControlName="target_url" type="url" autofocus>
+    </mat-form-field>
+    <mat-form-field class="full-width">
+        <mat-label>Port</mat-label>
+        <input matInput placeholder="Port" formControlName="port" type="number" autofocus>
     </mat-form-field>
 </form>

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { ProxyService, Settings, Status } from '../proxy.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ProxyService, ProxySettings, ProxyStatus } from '../../features/proxy/proxy.service';
 
 @Component({
   selector: 'proxy-status-view',
@@ -12,8 +12,8 @@ import { FormsModule } from '@angular/forms';
 })
 export class StatusViewComponent implements OnInit {
 
-    status!: Status;
-    settings!: Settings;
+    status!: ProxyStatus;
+    settings!: ProxySettings;
 
     constructor(private proxyService: ProxyService) {}
 

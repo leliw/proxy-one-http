@@ -1,1 +1,56 @@
-<p>session-table works!</p>
+<div class="table-filter">
+    <mat-form-field>
+        <mat-label>Filtr</mat-label>
+        <input matInput [(ngModel)]="dataSource.filter" placeholder="Filtr">
+        <mat-icon matPrefix>filter_alt</mat-icon>
+    </mat-form-field>
+</div>
+
+<table mat-table matSort>
+
+    <ng-container matColumnDef="session_id">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Id sesji</th>
+        <td mat-cell *matCellDef="let row">{{ row.session_id }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="session_date">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Data sesji</th>
+        <td mat-cell *matCellDef="let row">{{ row.session_date | date:'YYYY-MM-dd'  }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="target_url">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Adres URL</th>
+        <td mat-cell *matCellDef="let row">{{ row.target_url }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="description">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Opis</th>
+        <td mat-cell *matCellDef="let row">{{ row.description }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="requests_cnt">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Liczba żądań</th>
+        <td mat-cell *matCellDef="let row">{{ row.requests_cnt }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Akcje</th>
+        <td mat-cell *matCellDef="let row">
+            <button mat-icon-button (click)="viewSession(row.session_id)">
+                <mat-icon>visibility</mat-icon>
+            </button>
+            <button mat-icon-button (click)="deleteSession(row.session_id)">
+                <mat-icon>delete</mat-icon>
+            </button>
+        </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>
+
+<div *ngIf="dataSource.isLoading" class="is-loading-progress">
+    <mat-progress-spinner color="primary" mode="indeterminate" />
+</div>
+
+<mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons></mat-paginator>

@@ -4,7 +4,7 @@ from app.features.proxy.proxy_model import ProxySettings
 
 @pytest.fixture
 def proxy(client, tmp_port):
-    settings = ProxySettings(target_url="http://example.com", port=tmp_port).model_dump()
+    settings = ProxySettings(target_url="http://example.com", port=tmp_port, session_description="XXX").model_dump()
     result = client.post("/api/proxy/start", json=settings)
     assert 200 == result.status_code
 
@@ -23,3 +23,4 @@ def test_get_request_sessions(proxy, tmp_port):
     assert 200 == result.status_code
     r = result.json()
     assert 1 == len(r)
+    assert 'XXX' == r[0]['description']

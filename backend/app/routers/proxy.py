@@ -23,9 +23,9 @@ ServiceDep = Annotated[ProxyServerManager, Depends(get_service)]
 
 
 @router.post("/start")
-async def proxy_start(service: ServiceDep, settings: ProxySettings):
+async def proxy_start(service: ServiceDep, proxy_settings: ProxySettings):
     """Starts the proxy server"""
-    return service.start(UserConfig(port=settings.port, target_url=settings.target_url))
+    return service.start(proxy_settings)
 
 
 @router.post("/stop")

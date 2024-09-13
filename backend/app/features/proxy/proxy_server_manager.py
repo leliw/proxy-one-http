@@ -1,10 +1,9 @@
 import logging
 import threading
 
-from app.config import UserConfig
 from app.features.sessions.session_service import SessionService
 
-from .proxy_model import ProxyStatus
+from .proxy_model import ProxySettings, ProxyStatus
 from .stoppable_http_server import StoppableHttpServer
 from .proxy_http import ProxyHTTP
 
@@ -21,12 +20,15 @@ class ProxyServerManager:
         self._httpd = None
         self._thread = None
 
-    def start(self, config: UserConfig) -> ProxyStatus:
+    def start(self, proxySettings: ProxySettings) -> ProxyStatus:
         """Starts proxy server"""
-        self._port = config.port
-        self._target_url = config.target_url
+        self._port = proxySettings.port
+        self._target_url = proxySettings.target_url
         server_address = ("", self._port)
-        self.session_serivce.start_session(config.target_url)
+        self.session_serivce.start_session(
+            proxySettings.target_url, description=proxySettings.session_description
+        )
+
         def handler(*args, **kwargs):
             return ProxyHTTP(
                 *args,
@@ -59,7 +61,7 @@ class ProxyServerManager:
 
     def is_stopped(self) -> bool:
         return not bool(self._httpd)
-    
+
     def get_status(self) -> ProxyStatus:
         """Returns proxy server status"""
         return ProxyStatus(

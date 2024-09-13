@@ -4,7 +4,7 @@ from app.features.proxy.proxy_model import ProxySettings, ProxyStatus
 
 @pytest.fixture
 def proxy_settings_example(tmp_port) -> dict:
-    return ProxySettings(target_url="http://example.com", port=tmp_port).model_dump()
+    return ProxySettings(target_url="http://example.com", port=tmp_port, session_description="XXX").model_dump()
 
 
 def test_start_status_stop(client, proxy_settings_example):

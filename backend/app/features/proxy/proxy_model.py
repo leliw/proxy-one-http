@@ -10,6 +10,7 @@ class ProxySettings(BaseModel):
 
     port: int = 8999
     target_url: str = DEFAULT_TARGET_URL
+    session_description: Optional[str] = None
 
 
 class ProxyStatus(BaseModel):

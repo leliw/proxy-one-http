@@ -4,7 +4,7 @@ import logging
 import pytest
 import requests
 from ampf.base.base_storage import BaseStorage
-from app.config import UserConfig
+from app.features.proxy.proxy_model import ProxySettings
 from app.features.proxy.proxy_server_manager import ProxyServerManager
 from app.features.sessions.session_model import SessionRequest
 from app.features.sessions.session_service import SessionService
@@ -19,7 +19,7 @@ def session_service(factory):
 @pytest.fixture
 def server_manager(session_service, tmp_port):
     sm = ProxyServerManager(session_service)
-    sm.start(UserConfig(target_url="http://example.com", port=tmp_port))
+    sm.start(ProxySettings(target_url="http://example.com", port=tmp_port))
     yield sm
     sm.stop()
 
@@ -41,7 +41,7 @@ def test_init(session_service):
 def test_start_status_stop(session_service, tmp_port):
     t = ProxyServerManager(session_service)
 
-    assert t.start(UserConfig(port=tmp_port)) is not None
+    assert t.start(ProxySettings(port=tmp_port, session_description="XXX")) is not None
     s = t.get_status()
     assert s.status == "working"
     assert t.stop() is not None

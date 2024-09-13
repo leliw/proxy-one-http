@@ -43,5 +43,5 @@ ng serve --proxy-config=src/proxy.conf.json
 ## Running tests
 
 ```bash
-pytest --cov=app tests/ --cov-report html
+cd backend; pytest --cov=app tests/ --cov-report html; cd ..
 ```

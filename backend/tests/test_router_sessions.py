@@ -1,4 +1,3 @@
-import logging
 import pytest
 
 from app.features.sessions.session_model import Session, SessionRequest

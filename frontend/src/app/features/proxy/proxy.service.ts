@@ -10,7 +10,8 @@ export interface ProxyStatus {
 
 export interface ProxySettings {
     port: number;
-    target_url: string
+    target_url: string;
+    session_description?: string;
 }
 
 @Injectable({

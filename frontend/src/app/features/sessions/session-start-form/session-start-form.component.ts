@@ -21,7 +21,8 @@ export class SessionStartFormComponent {
     fb = inject(FormBuilder);
     form = this.fb.nonNullable.group({
         target_url: ['https://', [Validators.required, Validators.minLength(10)]],
-        port: [8999, [Validators.required, Validators.min(8000), Validators.max(8999)]]
+        port: [8999, [Validators.required, Validators.min(8000), Validators.max(8999)]],
+        session_description: '',
     })
 
     onSubmit(): ProxySettings | undefined {

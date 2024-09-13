@@ -28,7 +28,7 @@ def test_get_one(client, session_service):
     r = result.json()
     assert 1 == len(r)
 
-    key = r[0]
+    key = r[0]["session_id"]
 
     result = client.get(f"/api/sessions/{key}")
 

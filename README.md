@@ -39,3 +39,9 @@ and frontend in another terminal.
 cd frontend
 ng serve --proxy-config=src/proxy.conf.json
 ```
+
+## Running tests
+
+```bash
+pytest --cov=app tests/ --cov-report html
+```

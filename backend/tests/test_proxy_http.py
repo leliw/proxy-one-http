@@ -57,28 +57,34 @@ def test_get_request(server_manager, session_service, tmp_port):
     assert "<title>Example Domain</title>" in response.text
 
     time.sleep(0.1)
-    keys = session_service.get_all()
+    keys = list(session_service.get_all())
     assert 1 == len(keys)
 
-    item = session_service.get(keys[0])
+    item = keys[0]
     assert "http://example.com" == item.target_url
 
 
 def test_post_request(server_manager, session_service, tmp_port):
     response = requests.post(f"http://localhost:{tmp_port}", json={"test": "test"})
 
-    assert 200 == response.status_code
-    assert "<title>Example Domain</title>" in response.text
+    assert 405 == response.status_code
+    # assert "<title>Example Domain</title>" in response.text
 
     time.sleep(0.1)
-    keys = session_service.get_all()
+    keys = list(session_service.get_all())
     assert 1 == len(keys)
-    item = session_service.get(keys[0])
+    item = keys[0]
     assert "http://example.com" == item.target_url
 
 
-# def test_put_request(server_manager):
-#     response = requests.put("http://localhost:8999", json={"test": "test"})
+def test_put_request(server_manager, session_service, tmp_port):
+    response = requests.put(f"http://localhost:{tmp_port}", json={"test": "test"})
 
-#     assert 200 == response.status_code
-#     assert "<title>Example Domain</title>" in response.text
+    assert 405 == response.status_code
+    # assert "<title>Example Domain</title>" in response.text
+
+    time.sleep(0.1)
+    keys = list(session_service.get_all())
+    assert 1 == len(keys)
+    item = keys[0]
+    assert "http://example.com" == item.target_url

@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { Observable, map, of } from 'rxjs';
 
 export interface Config {
-    title: string;
     version: string;
 }
 

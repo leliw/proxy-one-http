@@ -1,26 +1,31 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { SessionStartFromComponent } from "../session-start-from/session-start-from.component";
+import { SessionStartFormComponent } from "../session-start-form/session-start-form.component";
 
 @Component({
     selector: 'app-session-start',
     standalone: true,
     imports: [
-    MatCardModule,
-    MatProgressBarModule,
-    MatButtonModule,
-],
+        MatCardModule,
+        MatProgressBarModule,
+        MatButtonModule,
+        SessionStartFormComponent
+    ],
     templateUrl: './session-start.component.html',
     styleUrl: './session-start.component.css'
 })
 export class SessionStartComponent {
+    @ViewChild(SessionStartFormComponent) paramsForm!: SessionStartFormComponent;
     status = signal("READY");
     percent = signal(0);
 
     start(): void {
-        this.status.set('IN PROGRESS');
+        const params = this.paramsForm.onSubmit();
+        if (params) {
+            this.status.set('IN PROGRESS');
+        }
     }
 
     stop(): void {

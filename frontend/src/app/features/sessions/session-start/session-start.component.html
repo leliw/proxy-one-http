@@ -1,1 +1,27 @@
-<p>session-start works!</p>
+<mat-card>
+    <mat-card-header>
+        <mat-card-title>Rejestracja sesji</mat-card-title>
+    </mat-card-header>
+    <mat-card-content #container>
+        @if (status()=="READY") {
+        }@else{
+        }
+    </mat-card-content>
+    <mat-card-actions>
+        @switch (status()) {
+        @case ("READY") {
+        <button mat-raised-button color="primary" (click)="start()">Start</button>
+        }
+        @case ("IN PROGRESS") {
+        <mat-progress-bar mode="determinate" [value]="percent"></mat-progress-bar>
+        <button mat-raised-button color="warn" (click)="stop()">Stop</button>
+        }@case ("CANCELED") {
+        <span warn>Proces został przerwany!</span>
+        }@case ("FINISHED") {
+        <span warn>Proces zakończył się pomyślnie.</span>
+        }@default{
+        <span>{{status()}}</span>
+        }
+        }
+    </mat-card-actions>
+</mat-card>

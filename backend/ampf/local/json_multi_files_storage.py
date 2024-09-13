@@ -55,16 +55,17 @@ class JsonMultiFilesStorage[T](BaseStorage[T], FileStorage):
             end_index = None
         for root, _, files in os.walk(self.folder_path):
             self._log.debug("keys -> walk %s %d", root, len(files))
-            if not Path(f"{root}.json").is_file():
+            if Path(f"{root}.json").is_file() and root != str(self.folder_path):
+                # If exists json file wtith the same name as directory
+                # and it's not root folder
+                # - skip it - it's subcollection
+                pass
+            else:
                 folder = root[start_index:-end_index] if end_index else root[start_index:]
                 for file in files:
                     k = f"{folder}/{file}" if folder else file
                     self._log.debug("keys: %s", k)
                     yield k[:-5] if k.endswith(".json") else k
-            else:
-                # If exists json file wtith the same name as directory
-                # - skip it - it's subcollection
-                pass
         self._log.debug("keys <- end")
 
     def delete(self, key: str) -> None:

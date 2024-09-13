@@ -7,17 +7,19 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Session, SessionHeader, SessionService } from '../session.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatTableDataSourceClientSide } from '../../../shared/mat-table-data-source-client-side';
 import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
     selector: 'app-session-table',
     standalone: true,
     imports: [
         CommonModule,
+        RouterModule,
         FormsModule,
         MatTableModule,
         MatPaginatorModule,
@@ -27,6 +29,7 @@ import { MatInputModule } from '@angular/material/input';
         MatInputModule,
         MatButtonModule,
         MatIconModule,
+        MatTooltipModule,
     ],
     templateUrl: './session-table.component.html',
     styleUrls: ['./session-table.component.css']

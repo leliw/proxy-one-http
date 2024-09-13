@@ -3,7 +3,7 @@ from typing import Optional
 from urllib.parse import parse_qs
 import uuid
 from bs4 import BeautifulSoup
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, computed_field
 from datetime import datetime, date
 
 
@@ -21,6 +21,11 @@ class SessionRequestHeader(BaseModel):
     url: str
     method: str
     status_code: Optional[int] = None
+
+    @computed_field
+    @property
+    def duration(self) -> Optional[str]:
+        return str(self.end - self.start) if self.end else None
 
 
 class SessionRequest(SessionRequestHeader):

@@ -2,11 +2,9 @@ import { Component, inject } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { ProxySettings } from '../../proxy/proxy.service';
 
-export interface Parameters {
-    target_url: string;
-    port: number
-}
+
 @Component({
     selector: 'app-session-start-form',
     standalone: true,
@@ -26,8 +24,8 @@ export class SessionStartFormComponent {
         port: [8999, [Validators.required, Validators.min(8000), Validators.max(8999)]]
     })
 
-    onSubmit(): Parameters | undefined {
+    onSubmit(): ProxySettings | undefined {
         if (this.form.invalid) return undefined;
-        else return this.form.getRawValue() as Parameters;
+        else return this.form.getRawValue() as ProxySettings;
     }
 }

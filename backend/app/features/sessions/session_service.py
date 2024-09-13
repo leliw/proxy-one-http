@@ -12,8 +12,8 @@ class SessionService:
     # def get_all(self) -> List[Session]:
     #     return [Session(**i.model_dump(by_alias=True)) for i in self.storage.get_all()]
 
-    def get_all(self) -> List[str]:
-        return list(self.storage.keys())
+    def get_all(self) -> List[Session]:
+        return self.storage.get_all()
 
     def get(self, key: str) -> Session:
         return self.storage.get(key)

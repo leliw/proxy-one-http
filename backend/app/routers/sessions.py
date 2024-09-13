@@ -2,7 +2,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 
 from app.dependencies import FactoryDep
-from app.features.sessions.session_model import Session, SessionRequest
+from app.features.sessions.session_model import Session
 from app.features.sessions.session_service import SessionService
 
 
@@ -17,7 +17,7 @@ SessionServiceDep = Annotated[SessionService, Depends(get_service)]
 
 
 @router.get("")
-async def get_all(service: SessionServiceDep) -> list[str]:
+async def get_all(service: SessionServiceDep) -> list[Session]:
     """Returns list of folders"""
     return service.get_all()
 

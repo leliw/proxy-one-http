@@ -1,4 +1,5 @@
 """Proxy Server"""
+import asyncio
 from http.server import SimpleHTTPRequestHandler
 import logging
 from socketserver import ThreadingMixIn
@@ -14,9 +15,10 @@ from app.features.sessions.session_service import SessionService
 class ProxyHTTP(ThreadingMixIn, SimpleHTTPRequestHandler):
     """Serwer proxy"""
 
-    def __init__(self, *args, session_serivce: SessionService, target_url: str, **kwargs):
+    def __init__(self, *args, session_serivce: SessionService, queue: asyncio.Queue, target_url: str, **kwargs):
         self.target_url = target_url
         self.session_service =  session_serivce
+        self.queue = queue
         self._log = logging.getLogger(__name__)
         self._log.debug("Proxy for %s", self.target_url)
         super().__init__(*args, **kwargs)
@@ -58,19 +60,18 @@ class ProxyHTTP(ThreadingMixIn, SimpleHTTPRequestHandler):
         return headers
 
     def _create_data(self) -> bytes:
-        """Pobranie body aktuanego żadnia i zwrócenie uch jako bytes"""
+        """Pobranie body aktualnego żądnia i zwrócenie ich jako bytes"""
         content_length = int(self.headers['Content-Length'])
         return self.rfile.read(content_length)
     
     def _save_request(self, req: SessionRequest, response: requests.Response):
-        req.status_code = response.status_code
+        """Save request with its respose in session."""
         req.end = datetime.now()
-        req.request_headers = {key: val for key, val in sorted(response.request.headers.items(), key=lambda e: e[0])}
-        req.response_headers = {key: val for key, val in sorted(response.headers.items(), key=lambda e: e[0])}
-        req.set_reqest_body(req.request_headers.get("Content-Type"), response.request.body)
-        req.set_response_body(req.response_headers.get("Content-Type"), response.content)
-
-        self.session_service.add(req)
+        req.set_response(response)
+        self.session_service.add_session_request(req)
+        m = f"({req.method}) {req.url} => {req.status_code}"
+        self._log.debug(m)
+        asyncio.run(self.queue.put(m))
     
     def _process_response(self, response: requests.Response):
         # Jeśli odpowiedź jest skompresowana, to usuwamy nagłówek Content-Encoding

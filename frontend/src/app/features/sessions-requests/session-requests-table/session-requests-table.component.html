@@ -1,0 +1,100 @@
+<div class="table-filter">
+    <mat-form-field>
+        <mat-label>Filtr</mat-label>
+        <input matInput [(ngModel)]="dataSource.filter" placeholder="Filtr">
+        <mat-icon matPrefix>filter_alt</mat-icon>
+    </mat-form-field>
+</div>
+
+<table mat-table matSort matSortActive="start" matSortDirection="asc">
+    <!-- Id Column -->
+    <ng-container matColumnDef="req_id">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Id</th>
+        <td mat-cell *matCellDef="let row">{{ row.req_id }}</td>
+    </ng-container>
+
+    <!-- Start Column -->
+    <ng-container matColumnDef="start">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Start</th>
+        <td mat-cell *matCellDef="let row">{{ row.start | date:'HH:mm:ss.SSS' }}</td>
+    </ng-container>
+
+    <!-- End Column -->
+    <ng-container matColumnDef="end">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>End</th>
+        <td mat-cell *matCellDef="let row">{{ row.end | date:'HH:mm:ss.SSS' }}</td>
+    </ng-container>
+
+    <!-- Duration Column -->
+    <ng-container matColumnDef="duration">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Duration</th>
+        <td mat-cell *matCellDef="let row">{{ row.duration }}</td>
+    </ng-container>
+
+    <!-- URL Column -->
+    <ng-container matColumnDef="url">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>URL</th>
+        <td mat-cell *matCellDef="let row">{{ row.url }}</td>
+    </ng-container>
+
+    <!-- Method Column -->
+    <ng-container matColumnDef="method">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Method</th>
+        <td mat-cell *matCellDef="let row">{{ row.method }}</td>
+    </ng-container>
+
+    <!-- Status Code Column -->
+    <ng-container matColumnDef="status_code">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Status Code</th>
+        <td mat-cell *matCellDef="let row">{{ row.status_code }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="resp_content_type">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Content-Type</th>
+        <td mat-cell *matCellDef="let row">{{ row.resp_content_type }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="description">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Description</th>
+        <td mat-cell *matCellDef="let row"  (click)="editDescription(row); $event.stopPropagation()">
+            {{ row.description }}
+            <mat-icon class="icon-small" matTooltip="Edit description">edit</mat-icon>
+        </td>
+    </ng-container>
+
+    <ng-container matColumnDef="cached">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Cached</th>
+        <td mat-cell *matCellDef="let row">
+            @if(row.cached) {
+            <mat-icon matTooltip="Request can be cached by client">cached</mat-icon>
+            }
+        </td>
+    </ng-container>
+
+    <ng-container matColumnDef="disabled">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Played / Disabled</th>
+        <td mat-cell *matCellDef="let row" (click)="switchDisabled(row); $event.stopPropagation()">
+            @if(row.disabled) {
+            <mat-icon matTooltip="Request won't be replayed">play_disabled</mat-icon>
+            } @else {
+            <mat-icon matTooltip="Request will be replayed">play_arrow</mat-icon>
+            }
+        </td>
+    </ng-container>
+
+    <!-- Duration Column -->
+    <ng-container matColumnDef="resp_content_length">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Content-Length</th>
+        <td mat-cell *matCellDef="let row">{{ row.resp_content_length }}</td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns" class="clickable" (click)="viewRow(row)"></tr>
+</table>
+
+<mat-paginator [pageSizeOptions]="[10, 25, 100]" showFirstLastButtons>
+</mat-paginator>
+
+<div class="is-loading-progress" *ngIf="dataSource.isLoading">
+    <mat-progress-spinner color="primary" mode="indeterminate"></mat-progress-spinner>
+</div>

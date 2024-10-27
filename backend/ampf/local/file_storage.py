@@ -1,6 +1,7 @@
 from abc import ABC
 import os
 from pathlib import Path
+import re
 
 type StrPath = str | Path
 
@@ -49,6 +50,37 @@ class FileStorage(ABC):
         ext = ext or self.default_ext
         if ext:
             file_name = f"{file_name}.{ext}"
+        file_name = self._normalize_filename(file_name)
         path = self.folder_path.joinpath(*self._split_to_folders(file_name))
         os.makedirs(path.parent, exist_ok=True)
         return path
+
+    def _normalize_filename(self, file_name: str) -> str:
+        """
+        Konwertuje dowolny ciąg znaków na poprawną nazwę pliku.
+
+        Args:
+            filename: Ciąg znaków do konwersji.
+
+        Returns:
+            Poprawna nazwa pliku.
+        """
+        # Usuwa wszystkie niedozwolone znaki
+        p = Path(file_name)
+        name = p.name
+        name = re.sub(r'[\\/:"*?<>|]', '_', name)
+        # Zamienia wiele spacji na pojedyncze
+        name = re.sub(r'\s+', ' ', name)
+        # Usuwa spacje z początku i końca
+        name = name.strip()
+
+        if len(name) > 255:
+            ext = p.suffix
+            ext_len = len(ext)
+            name_len = 255 - ext_len
+            name = name[:name_len]
+            name = f"{name}{ext}"
+        if p.parent and str(p.parent) != '.':
+            return f"{p.parent}/{name}"
+        else:
+            return name

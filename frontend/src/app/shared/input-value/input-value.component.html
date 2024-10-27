@@ -1,0 +1,20 @@
+@if (data.title) {<h2 mat-dialog-title>{{data.title}}</h2>}
+<mat-dialog-content>
+    @if (data.prompt) {<p>{{data.prompt}}</p>}
+    <mat-form-field>
+        <mat-label>{{data.label}}</mat-label>
+        @if (data.options || data.options$) {
+            <mat-select [(value)]="data.value"> 
+                @for (option of data.options; track option) {
+                  <mat-option [value]="option">{{option}}</mat-option>
+                }
+              </mat-select>
+            } @else {
+        <input matInput [(ngModel)]="data.value" cdkFocusInitial>
+        }
+    </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions>
+    <button mat-raised-button (click)="cancel()">Cancel</button>
+    <button mat-raised-button color="primary" [mat-dialog-close]="data.value">Ok</button>
+</mat-dialog-actions>

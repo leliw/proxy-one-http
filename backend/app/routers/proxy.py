@@ -1,15 +1,14 @@
 from typing import Annotated
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, WebSocket
 
-from app.config import UserConfig
 from app.features.proxy.proxy_model import ProxySettings, ProxyStatus
 from app.features.proxy.proxy_server_manager import ProxyServerManager
 from app.routers.sessions import SessionServiceDep
 
-
 router = APIRouter(tags=["Proxy server"])
 # The same object has to be accessible between requests
 proxy_service_manager: ProxyServerManager = None
+
 
 def get_service(session_service: SessionServiceDep) -> ProxyServerManager:
     global proxy_service_manager
@@ -38,3 +37,10 @@ async def proxy_stop(service: ServiceDep):
 async def proxy_status(service: ServiceDep) -> ProxyStatus:
     """Returns porxy server status"""
     return service.get_status()
+
+
+@router.websocket("/logs")
+async def websocket_endpoint(service: ServiceDep, websocket: WebSocket):
+    await websocket.accept()
+    async for m in service.process():
+        await websocket.send_text(m)

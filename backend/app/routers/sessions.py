@@ -1,33 +1,38 @@
 from typing import Annotated, List
 from fastapi import APIRouter, Depends
 
-from app.dependencies import FactoryDep
-from app.features.sessions.session_model import Session, SessionRequestHeader
+from app.dependencies import SessionStorageDep
+from app.features.sessions.session_model import Session
 from app.features.sessions.session_service import SessionService
 
 
-router = APIRouter(tags=["Sessions"])
+router = APIRouter(tags=["Sesje"])
 
 
-def get_service(factory: FactoryDep) -> SessionService:
-    return SessionService(factory)
+def get_service(storage: SessionStorageDep) -> SessionService:
+    return SessionService(storage)
 
 
 SessionServiceDep = Annotated[SessionService, Depends(get_service)]
 
 
 @router.get("")
-async def get_all(service: SessionServiceDep) -> List[Session]:
+def get_all(service: SessionServiceDep) -> List[Session]:
     """Returns list of folders"""
     return service.get_all()
 
 
-@router.get("/{key}")
-async def get(service: SessionServiceDep, key: str) -> Session:
+@router.get("/{session_id}")
+async def get(service: SessionServiceDep, session_id: str) -> Session:
     """Returns file content"""
-    return service.get(key)
+    return service.get(session_id)
 
-@router.get("/{key}/requests")
-async def get_requests(service: SessionServiceDep, key: str) -> List[SessionRequestHeader]:
-    req_service = service.create_request_service(key)
-    return req_service.get_all()
+
+@router.put("/{session_id}")
+async def put(service: SessionServiceDep, session_id: str, session: Session) -> None:
+    service.put(session_id, session)
+
+
+@router.delete("/{session_id}")
+async def delete(service: SessionServiceDep, session_id: str) -> None:
+    service.delete(session_id)

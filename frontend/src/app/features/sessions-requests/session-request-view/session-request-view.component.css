@@ -1,0 +1,40 @@
+/* Cards */
+
+mat-card-header {
+    margin-bottom: 10px;
+  }
+  
+  mat-card-actions button {
+    margin-left: 10px
+  }
+  
+  /* Properties - description list */
+  
+  .properties-table h3 {
+    margin-top: 1em;
+    margin-bottom: 0.1em;
+    box-shadow: inset 0 -1px 0 0 lightgrey;
+  }
+  
+  .properties-table dl {
+    display: grid;
+    grid-gap: 4px 16px;
+    grid-template-columns: max-content;
+    margin-top: 0.1em;
+    margin-left: 1em;
+  }
+  
+  .properties-table dt {
+    width: 30em;
+    font-weight: normal;
+    overflow: auto;
+  }
+  
+  .properties-table dt::after {
+    content: ":";
+  }
+  
+  .properties-table dd {
+    margin: 0;
+    grid-column-start: 2;
+  }

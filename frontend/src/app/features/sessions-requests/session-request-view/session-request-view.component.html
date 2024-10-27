@@ -1,0 +1,127 @@
+@if (data) {
+<mat-accordion>
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title>Request details</mat-panel-title>
+            <mat-panel-description>{{ data.start | date:'HH:mm:ss'}} ({{ data.method }}) {{ data.url }} => {{
+                data.status_code }}</mat-panel-description>
+        </mat-expansion-panel-header>
+        <div class="properties-table">
+            <dl>
+                <dt>Start</dt>
+                <dd>{{ data.start }}</dd>
+                <dt>End</dt>
+                <dd>{{ data.end }}</dd>
+                <dt>URL</dt>
+                <dd>{{ data.url }}</dd>
+                <dt>Method</dt>
+                <dd>{{ data.method }}</dd>
+                <dt>Status Code</dt>
+                <dd>{{ data.status_code }}</dd>
+                <dt>Duration</dt>
+                <dd>{{ data.duration }}</dd>
+            </dl>
+        </div>
+    </mat-expansion-panel>
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title>Request headers</mat-panel-title>
+            <mat-panel-description>
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+        <div class="properties-table">
+            <dl>
+                @for(header of data.request_headers | keyvalue; track header.key) {
+                <dt>{{ header.key }}</dt>
+                <dd>{{ header.value }}</dd>
+                }
+            </dl>
+        </div>
+    </mat-expansion-panel>
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title>Response headers</mat-panel-title>
+            <mat-panel-description></mat-panel-description>
+        </mat-expansion-panel-header>
+        <div class="properties-table">
+            <dl>
+                @for(header of data.response_headers | keyvalue; track header.key) {
+                <dt>{{ header.key }}</dt>
+                <dd>{{ header.value }}</dd>
+                }
+            </dl>
+        </div>
+    </mat-expansion-panel>
+    @if (data.request_body_form || data.request_body_str || data.request_body_bytes) {
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title>Request body</mat-panel-title>
+            <mat-panel-description>
+                @if (data.request_headers["Content-Type"]) {
+                Content-Type: {{data.request_headers["Content-Type"]}}
+                }
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+        @if (data.request_body_form) {
+        <div class="properties-table">
+            <h3>Request Body (Form)</h3>
+            <dl>
+                @for(header of data.request_body_form | keyvalue; track header.key) {
+                <dt>{{ header.key }}</dt>
+                <dd>{{ header.value }}</dd>
+                }
+            </dl>
+        </div>
+        } @else if (data.request_body_str) {
+        <div class="properties-table">
+            <h3>Request Body</h3>
+            <pre>{{ data.request_body_str }}</pre>
+        </div>
+        } @else if (data.request_body_bytes) {
+        <div class="properties-table">
+            <h3>Request Body</h3>
+            <pre>{{ data.request_body_bytes }}</pre>
+        </div>
+        }
+    </mat-expansion-panel>
+    }
+    @if (data.response_body_json || data.response_body_str) {
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title>Response body</mat-panel-title>
+            <mat-panel-description>
+                @if (data.response_headers["Content-Type"]) {
+                Content-Type: {{data.response_headers["Content-Type"]}}
+                }
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+        @if (data.response_body_json) {
+        <div class="properties-table">
+            <pre>{{ data.response_body_json | json }}</pre>
+        </div>
+        } @else if (data.response_body_str) {
+        <div class="properties-table">
+            <pre>{{ data.response_body_str }}</pre>
+        </div>
+        }
+    </mat-expansion-panel>
+    }
+    @if (data.response_body_form_values) {
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title>Response body</mat-panel-title>
+            <mat-panel-description>(form values)</mat-panel-description>
+        </mat-expansion-panel-header>
+        <div class="properties-table">
+            <h3>Response Body (Form values)</h3>
+            <dl>
+                @for(header of data.response_body_form_values | keyvalue; track header.key) {
+                <dt>{{ header.key }}</dt>
+                <dd>{{ header.value }}</dd>
+                }
+            </dl>
+        </div>
+    </mat-expansion-panel>
+    }
+</mat-accordion>
+}

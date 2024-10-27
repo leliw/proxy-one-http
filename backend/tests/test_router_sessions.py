@@ -1,12 +1,4 @@
-import pytest
-
 from app.features.sessions.session_model import Session, SessionRequest
-from app.features.sessions.session_service import SessionService
-
-
-@pytest.fixture
-def session_service(factory) -> SessionService:
-    return SessionService(factory)
 
 
 def test_get_empty(client):
@@ -19,7 +11,7 @@ def test_get_empty(client):
 
 def test_get_one(client, session_service):
     session_service.start_session(target_url="test")
-    session_service.add(SessionRequest(url="/", method="GET"))
+    session_service.add_session_request(SessionRequest(url="/", method="GET"))
     session_service.stop_session()
 
     result = client.get("/api/sessions")

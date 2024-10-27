@@ -1,4 +1,111 @@
 /* You can add global styles to this file, and also import other style files */
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html,
+body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+/* Tabele */
+
+.table-filter {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+.table-filter mat-form-field {
+    flex: 1;
+    align-items: stretch;
+    font-size: 14px;
+    margin: 0.5em;
+    margin-bottom: 0px;
+}
+
+.table-filter .mat-mdc-form-field-subscript-wrapper {
+    display: none !important;
+}
+
+div.is-loading-progress {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+tr.clickable {
+    cursor: pointer;
+}
+
+tr.clickable:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* Dialogs */
+
+mat-dialog-content {
+    padding-bottom: 0px !important;
+}
+
+mat-dialog-content mat-form-field {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+mat-dialog-actions {
+    justify-content: right;
+}
+
+mat-dialog-actions button {
+    margin: 0 0.5rem;
+}
+
+.properties-table h3 {
+    margin-top: 1em;
+    margin-bottom: 0.1em;
+    box-shadow: inset 0 -1px 0 0 lightgrey;
+}
+
+.properties-table dl {
+    display: grid;
+    grid-gap: 4px 16px;
+    grid-template-columns: max-content;
+    margin-top: 0.1em;
+    margin-left: 1em;
+}
+
+.properties-table dt {
+    width: 12em;
+    font-weight: bold;
+}
+
+.properties-table dt::after {
+    content: ":";
+}
+
+.properties-table dd {
+    margin: 0;
+    grid-column-start: 2;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+}
+
+.col {
+    flex: 1;
+    margin-right: 20px;
+}
+
+.col:last-child {
+    margin-right: 0;
+}

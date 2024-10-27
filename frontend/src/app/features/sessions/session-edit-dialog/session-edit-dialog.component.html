@@ -1,0 +1,28 @@
+<h2 mat-dialog-title>Session: {{data.session_id}}</h2>
+<mat-dialog-content>
+    <mat-form-field>
+        <mat-label>Description</mat-label>
+        <input matInput [(ngModel)]="data.description" cdkFocusInitial>
+    </mat-form-field>
+
+    <mat-form-field>
+        <mat-label>Variables</mat-label>
+        <mat-chip-grid #chipGrid aria-label="Enter variables" [(ngModel)]="data.variables">
+            @for (chip of data.variables; track chip) {
+            <mat-chip-row (removed)="removeChip(chip)">
+                {{chip}}
+                <button matChipRemove>
+                    <mat-icon>cancel</mat-icon>
+                </button>
+            </mat-chip-row>
+            }
+        </mat-chip-grid>
+        <input placeholder="New variable..." [matChipInputFor]="chipGrid"
+            (matChipInputTokenEnd)="addChip($event)" />
+    </mat-form-field>
+
+</mat-dialog-content>
+<mat-dialog-actions>
+    <button mat-raised-button (click)="cancel()">Cancel</button>
+    <button mat-raised-button color="primary" [mat-dialog-close]="data">Save</button>
+</mat-dialog-actions>

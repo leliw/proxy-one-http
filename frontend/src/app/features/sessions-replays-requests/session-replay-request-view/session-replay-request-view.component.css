@@ -1,0 +1,38 @@
+
+.row {
+    width: 100%;
+    max-height: 60em;
+    overflow-y: scroll;
+}
+.col {
+    max-width: 50%;
+    overflow-x: auto;
+    height: fit-content;
+}
+
+::ng-deep app-properties-comparison-table table {
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+::ng-deep app-properties-comparison-table table tr .properties {
+    font-weight: bolder;
+    width: 20em;
+    text-align: right;
+    padding-right: 1em;
+}
+
+::ng-deep app-properties-comparison-table table tr td.properties::after {
+    content: ":";
+}
+
+::ng-deep app-properties-comparison-table table tr td.first,
+::ng-deep app-properties-comparison-table table tr td.second,
+::ng-deep app-properties-comparison-table table th td.first,
+::ng-deep app-properties-comparison-table table th td.second {
+    border: 1px solid gray;
+    text-align: center;
+    width: 40%;
+    overflow: auto;
+}

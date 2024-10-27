@@ -1,0 +1,18 @@
+<table>
+    <tr>
+        <th class="properties">{{propertyHeader}}</th>
+        <th class="first">{{firstHeader}}</th>
+        <th class="second">{{secondHeader}}</th>
+    </tr>
+    @for(key of keys; track key) {
+    <tr>
+        <td class="properties">{{ key }}</td>
+        @if (first[key]==second[key]) {
+        <td class="first" colspan="2">{{ first[key] }}</td>
+        } @else {
+            <td class="first">{{ first[key] }}</td>
+            <td class="second">{{ second[key] }}</td>    
+        }
+    </tr>
+    }
+</table>

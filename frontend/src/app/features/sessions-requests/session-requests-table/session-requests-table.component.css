@@ -1,0 +1,7 @@
+td {
+    max-width: 30em;
+}
+
+.icon-small {
+    transform: scale(0.75);
+}

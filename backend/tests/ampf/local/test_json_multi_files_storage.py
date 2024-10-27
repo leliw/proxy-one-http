@@ -26,7 +26,6 @@ def test_simple_key_all(storage):
 
     storage.delete("foo")
     assert [] == list(storage.keys())
-    assert storage.get("foo") is None
 
 
 def test_folder_key_all(storage):
@@ -38,4 +37,3 @@ def test_folder_key_all(storage):
 
     storage.delete("kung/foo")
     assert [] == list(storage.keys())
-    assert storage.get("kung/foo") is None

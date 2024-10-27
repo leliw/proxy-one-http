@@ -1,0 +1,114 @@
+@if (data) {
+<mat-accordion>
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title>Request details</mat-panel-title>
+            <mat-panel-description> ({{ data.method }}) {{ data.url }} =>
+                {{data.repl.status_code}}</mat-panel-description>
+        </mat-expansion-panel-header>
+        <app-properties-comparison-table propertyHeader="" firstHeader="Oryginal" secondHeader="Replay"
+            [keys]="['start', 'end', 'url', 'method', 'status_code', 'duration']" [first]="data.org"
+            [second]="data.repl"></app-properties-comparison-table>
+    </mat-expansion-panel>
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title>Request headers</mat-panel-title>
+            <mat-panel-description>
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+        <app-properties-comparison-table propertyHeader="" firstHeader="Oryginal" secondHeader="Replay"
+            [first]="data.org.request_headers" [second]="data.repl.request_headers"></app-properties-comparison-table>
+    </mat-expansion-panel>
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title>Response headers</mat-panel-title>
+            <mat-panel-description></mat-panel-description>
+        </mat-expansion-panel-header>
+        <app-properties-comparison-table propertyHeader="" firstHeader="Oryginal" secondHeader="Replay"
+            [first]="data.org.response_headers" [second]="data.repl.response_headers"></app-properties-comparison-table>
+    </mat-expansion-panel>
+    @if (data.repl.request_body_form || data.repl.request_body_str || data.repl.request_body_bytes) {
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title>Request body</mat-panel-title>
+            <mat-panel-description>
+                @if (data.repl.request_headers["Content-Type"]) {
+                Content-Type: {{data.repl.request_headers["Content-Type"]}}
+                }
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+        @if (data.org.request_body_form) {
+        <app-properties-comparison-table propertyHeader="" firstHeader="Oryginal" secondHeader="Replay"
+            [first]="data.org.request_body_form"
+            [second]="data.repl.request_body_form"></app-properties-comparison-table>
+        } @else if (data.repl.request_body_str) {
+        <div class="properties-table">
+            <h3>Request Body</h3>
+            <pre>{{ data.repl.request_body_str }}</pre>
+        </div>
+        } @else if (data.repl.request_body_bytes) {
+        <div class="properties-table">
+            <h3>Request Body</h3>
+            <pre>{{ data.repl.request_body_bytes }}</pre>
+        </div>
+        }
+    </mat-expansion-panel>
+    }
+    @if (data.org.response_body_json || data.org.response_body_str || data.repl.response_body_json ||
+    data.repl.response_body_str) {
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title>Response body</mat-panel-title>
+            <mat-panel-description>
+                @if (data.repl.response_headers["Content-Type"]) {
+                Content-Type: {{data.repl.response_headers["Content-Type"]}}
+                }
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+        <div class="row">
+            @if (data.org.response_body_json) {
+            <div class="col properties-table full-width">
+                <pre>{{ data.org.response_body_json | json }}</pre>
+            </div>
+            } @else if (data.repl.response_body_str) {
+            <div class="col properties-table">
+                <pre>{{ data.org.response_body_str }}</pre>
+            </div>
+            }
+            @if (data.repl.response_body_json) {
+            <div class="col properties-table">
+                <pre>{{ data.repl.response_body_json | json }}</pre>
+            </div>
+            } @else if (data.repl.response_body_str) {
+            <div class="col properties-table">
+                <pre>{{ data.repl.response_body_str }}</pre>
+            </div>
+            }
+        </div>
+    </mat-expansion-panel>
+    }
+    @if (data.repl.response_body_form_values) {
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title>Response body</mat-panel-title>
+            <mat-panel-description>(form values)</mat-panel-description>
+        </mat-expansion-panel-header>
+        <app-properties-comparison-table propertyHeader="" firstHeader="Oryginal" secondHeader="Replay"
+            [first]="data.org.response_body_form_values"
+            [second]="data.repl.response_body_form_values"></app-properties-comparison-table>
+    </mat-expansion-panel>
+    }
+    @if (data.diff || data.diff_dict) {
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title>Difference</mat-panel-title>
+            <mat-panel-description></mat-panel-description>
+        </mat-expansion-panel-header>
+        <pre>{{data.diff}}</pre>
+        <hr />
+        <pre>{{data.diff_dict | json}}</pre>
+    </mat-expansion-panel>
+    }
+
+</mat-accordion>
+}

@@ -3,6 +3,8 @@
         @if (status()=="READY") {
             <app-session-start-form />
         }@else{
+            <pre>@for (d of data; track d) {
+{{d}} }</pre>
         }
     </mat-card-content>
     <mat-card-actions>
@@ -11,7 +13,7 @@
         <button mat-raised-button color="primary" (click)="start()">Start</button>
         }
         @case ("IN PROGRESS") {
-        <mat-progress-bar mode="determinate" [value]="percent"></mat-progress-bar>
+        <mat-progress-bar mode="indeterminate" [value]="percent"></mat-progress-bar>
         <button mat-raised-button color="warn" (click)="stop()">Stop</button>
         }@case ("CANCELED") {
         <span warn>Proces został przerwany!</span>

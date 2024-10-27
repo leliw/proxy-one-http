@@ -1,0 +1,32 @@
+table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+tr.detail-row {
+    height: 0;
+}
+
+.element-detail {
+    overflow-x: scroll;
+    display: flex;
+    max-height: 30rem;
+    white-space: pre-wrap;
+}
+
+.properties-table dt {
+    width: 25em;
+    font-weight: normal;
+    border-top: 1px solid;
+    padding-top: 5px;
+
+}
+
+.properties-table dt:first-child {
+    border-top: none;
+    padding-top: none;
+}
+
+.properties-table dd {
+    white-space: pre-wrap;
+}

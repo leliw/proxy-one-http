@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { WebSocketSubject } from 'rxjs/webSocket';
+import { WebSocketService } from '../../shared/web-socket.service';
 
 export interface ProxyStatus {
     status: string;
@@ -14,12 +16,14 @@ export interface ProxySettings {
     session_description?: string;
 }
 
+
 @Injectable({
     providedIn: 'root'
 })
 export class ProxyService {
 
     private apiUrl = "/api/proxy"
+    private ws = new WebSocketService<string>(`${this.apiUrl}/logs`);
 
     constructor(private http: HttpClient) { }
 
@@ -32,7 +36,11 @@ export class ProxyService {
     }
 
     stop(): Observable<ProxyStatus> {
+        this.ws.close();
         return this.http.post<ProxyStatus>(this.apiUrl + '/stop', '');
     }
 
+    logs(): WebSocketSubject<string> {
+        return this.ws.connect()
+    }
 }

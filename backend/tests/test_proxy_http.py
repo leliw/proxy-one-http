@@ -7,13 +7,6 @@ from ampf.base.base_storage import BaseStorage
 from app.features.proxy.proxy_model import ProxySettings
 from app.features.proxy.proxy_server_manager import ProxyServerManager
 from app.features.sessions.session_model import SessionRequest
-from app.features.sessions.session_service import SessionService
-
-
-@pytest.fixture
-def session_service(factory):
-    logging.getLogger("ampf.local.json_multi_files_storage").setLevel(logging.DEBUG)
-    return SessionService(factory)
 
 
 @pytest.fixture

@@ -1,5 +1,7 @@
+import asyncio
 import logging
 import threading
+from typing import AsyncGenerator
 
 from app.features.sessions.session_service import SessionService
 
@@ -19,6 +21,7 @@ class ProxyServerManager:
         self._port = None
         self._httpd = None
         self._thread = None
+        self.queue = asyncio.Queue()
 
     def start(self, proxySettings: ProxySettings) -> ProxyStatus:
         """Starts proxy server"""
@@ -34,6 +37,7 @@ class ProxyServerManager:
                 *args,
                 target_url=self._target_url,
                 session_serivce=self.session_serivce,
+                queue=self.queue,
                 **kwargs,
             )
 
@@ -71,3 +75,11 @@ class ProxyServerManager:
                 "target_url": self._target_url,
             }
         )
+
+    async def process(self) -> AsyncGenerator[str, None]:
+        self._log.debug("process")
+        while self._httpd:
+            m = await self.queue.get()
+            self._log.debug(m)
+            yield m
+            self.queue.task_done()

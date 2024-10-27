@@ -1,14 +1,18 @@
 import logging
-from typing import List, Optional
-from ampf.base.ampf_base_factory import AmpfBaseFactory
-from app.features.sessions.session_model import SessionRequest, SessionRequestHeader
+from typing import Iterator, List
+from ampf.base.ampf_base_factory import BaseStorage
+from app.features.sessions.session_model import SessionRequest, SessionRequestHeader, SessionRequestPatch
 
 
 class SessionRequestService:
-    def __init__(self, factory: AmpfBaseFactory, session_id: str) -> None:
-        self.storage = factory.create_storage(f"sessions/{session_id}", SessionRequest)
+    def __init__(self, storage: BaseStorage[SessionRequest]) -> None:
+        self.storage = storage
         self._log = logging.getLogger(__name__)
-        
+
+    def keys(self) -> Iterator[str]:
+        for k in self.storage.keys():
+            yield k
+
     def get_all(self) -> List[SessionRequestHeader]:
         return [
             SessionRequestHeader(**i.model_dump(by_alias=True))
@@ -16,17 +20,9 @@ class SessionRequestService:
         ]
 
     def post(self, req: SessionRequest) -> None:
-        key = "_".join(
-            [
-                str(req.start).replace(" ", "_"),
-                req.method,
-                req.url.replace("/", "_"),
-                str(req.status_code),
-            ]
-        )
-        self.put(key, req)
+        self.storage.create(req)
 
-    def get(self, key: str) -> Optional[SessionRequest]:
+    def get(self, key: str) -> SessionRequest:
         return self.storage.get(key)
 
     def put(self, key: str, item: SessionRequest) -> None:
@@ -35,3 +31,10 @@ class SessionRequestService:
 
     def delete(self, key: str) -> bool:
         return self.storage.delete(key)
+
+    def patch(self, key: str, patch_data: SessionRequestPatch) -> None:
+        self._log.debug("patch %s", key)
+        item = self.storage.get(key)
+        patch_dict = patch_data.model_dump(exclude_unset=True)
+        item.__dict__.update(patch_dict)
+        self.storage.put(key, item)

@@ -4,6 +4,8 @@ from fastapi.testclient import TestClient
 import pytest
 
 from ampf.local.ampf_local_factory import AmpfLocalFactory
+from app.features.sessions.session_model import Session, SessionReplay, SessionReplayRequest, SessionRequest
+from app.features.sessions.session_service import SessionService
 from app.main import app
 from app.config import ServerConfig
 from app.dependencies import get_factory, get_server_config
@@ -37,3 +39,16 @@ def client(factory, server_config):
     app.dependency_overrides[get_server_config] = lambda: server_config
     return TestClient(app)
 
+@pytest.fixture
+def session_storage(factory):
+    storage = factory.create_storage("sessions", Session)
+    repl_storage = factory.create_storage("replays", SessionReplay, "replay_id")
+    repl_storage.add_subcollection(factory.create_storage("requests", SessionReplayRequest, "req_id"))
+    storage.add_subcollection(repl_storage)
+    storage.add_subcollection(factory.create_storage("requests", SessionRequest, "req_id"))
+    return storage
+
+
+@pytest.fixture
+def session_service(session_storage) -> SessionService:
+    return SessionService(session_storage)

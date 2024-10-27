@@ -1,3 +1,24 @@
+:host {
+    padding: 0.5em;
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+mat-card {
+    margin: 0em 0em;
+    flex: 1 1 auto;
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+mat-card .mat-mdc-card-content {
+    flex: 1 1 auto;
+    padding-top:  9px;
+    overflow-y: auto;
+}
+
 mat-card-actions {
     display: flex;
     flex-direction: row;
